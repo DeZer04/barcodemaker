@@ -182,36 +182,47 @@
         <!-- Line Selection -->
         <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
             <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Line Configuration</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Origin Line</label>
-                    <select
-                        class="select-custom w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                        id="originLineSelect" onchange="updateCodeOptions()">
-                        <option value="" disabled selected>Select Origin Line</option>
-                        @foreach ($origins as $origin)
-                            <option value="{{ $origin->id }}" data-codes="{{ $origin->kode_origin }}">
-                                {{ $origin->name_origin }}</option>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Letter</label>
+                    <div class="grid grid-cols-10 gap-2">
+                        @foreach (range('A', 'Z') as $letter)
+                            <button type="button" 
+                                class="letter-button text-black focus:text-black hover:text-black px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                                data-letter="{{ $letter }}"
+                                onclick="selectLetter(this)">
+                                {{ $letter }}
+                            </button>
                         @endforeach
-                    </select>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Code</label>
-                    <select
-                        class="select-custom w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                        id="codeSelect">
-                        <option value="" disabled selected>Select Code</option>
-                    </select>
+                <div class="col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Selected Letter</label>
+                    <input type="text" id="selectedLetter" 
+                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                        readonly>
                 </div>
-
-                <script></script>
             </div>
+
+            <script>
+                function selectLetter(button) {
+                    const selectedLetter = button.getAttribute('data-letter');
+                    document.getElementById('selectedLetter').value = selectedLetter;
+
+                    // Highlight selected button
+                    document.querySelectorAll('.letter-button').forEach(btn => {
+                        btn.classList.remove('bg-blue-500', 'text-black');
+                        btn.classList.add('bg-white', 'dark:bg-gray-700', 'text-black');
+                    });
+                    button.classList.add('bg-blue-500', 'text-black');
+                }
+            </script>
             <button
                 class="btn-primary w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
                 onclick="openAddLineModal()">
                 <span class="flex items-center justify-center gap-2">
                     <i class="fa-solid fa-plus"></i>
-                    Add New Line
+                    Manage Line
                 </span>
             </button>
         </div>
@@ -352,7 +363,7 @@
                     <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-2 rounded-lg"
                         data-id="{{ $finishing->id }}">
                         <span>{{ $finishing->name_finishing }}</span>
-                        <button type="button" onclick="deleteFinishing({{ $finishing->id }})"
+                        <button type="button" onclick="deleteFinishing('{{ $finishing->id }}')"
                             class="text-red-600 hover:text-red-800 transition-colors duration-200">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -389,7 +400,7 @@
                     <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-2 rounded-lg"
                         data-id="{{ $grade->id }}">
                         <span class="ml-4">{{ $grade->name_grade }}</span>
-                        <button type="button" onclick="deleteGrade({{ $grade->id }})"
+                        <button type="button" onclick="deleteGrade('{{ $grade->id }}')"
                             class="text-red-600 hover:text-red-800 transition-colors duration-200">
                             <i class="fa-solid fa-trash mr-4"></i>
                         </button>
@@ -572,6 +583,9 @@
 
                         // Show success modal
                         showModalMessage('Grade deleted successfully');
+
+                        //close confirmation modal
+                        document.body.removeChild(confirmModal);
                     })
                     .catch(error => {
                         console.error('Error:', error);

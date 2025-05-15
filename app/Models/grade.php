@@ -2,16 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\item as Item;
 
 class grade extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'name_grade'
+        'name_grade',
     ];
 
-    public function item ()
+    // Define relationship to items
+    public function items()
     {
-        return $this->hasMany(item::class);
+        return $this->hasMany(Item::class, 'grade_id');
     }
 }

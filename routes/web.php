@@ -10,6 +10,27 @@ Route::get('/', function () {
 
 Route::get('/barcode', [BarcodeController::class, 'index'])->name('barcode');
 
+// Item
+Route::post('/barcode/item', [BarcodeController::class, 'storeItem'])->name('barcode.items.store');
+Route::post('/barcode/grade', [BarcodeController::class, 'storeGrade'])->name('barcode.grades.store');
+Route::delete('/barcode/grade/{grade}', [BarcodeController::class, 'destroyGrade'])->name('barcode.grades.destroy');
+Route::post('/barcode/finishing', [BarcodeController::class, 'storeFinishing'])->name('barcode.finishings.store');
+Route::delete('/barcode/finishing/{finishing}', [BarcodeController::class, 'destroyFinishing'])->name('barcode.finishings.destroy');
+
+// Buyer
+Route::post('/barcode/buyer', [BarcodeController::class, 'storeBuyer'])->name('barcode.buyers.store');
+Route::put('/barcode/buyer/{buyer}', [BarcodeController::class, 'updateBuyer'])->name('barcode.buyers.update');
+Route::delete('/barcode/buyer/{buyer}', [BarcodeController::class, 'destroyBuyer'])->name('barcode.buyers.destroy');
+
+// Purchase
+Route::post('/barcode/purchase', [BarcodeController::class, 'storePurchase'])->name('barcode.purchases.store');
+Route::put('/barcode/purchase/{purchase}', [BarcodeController::class, 'updatePurchase'])->name('barcode.purchases.update');
+Route::delete('/barcode/purchase/{purchase}', [BarcodeController::class, 'destroyPurchase'])->name('barcode.purchases.destroy');
+
+// API for dynamic dropdown
+Route::get('/api/buyers/{buyer}/purchases', [BarcodeController::class, 'getPurchasesByBuyer']);
+
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');

@@ -23,6 +23,13 @@ return new class extends Migration
             $table->string('purchaseindex');
             $table->timestamps();
         });
+
+        Schema::create('containers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('purchase_id')->constrained('purchases')->onDelete('cascade');
+            $table->string('containerindex');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -30,6 +37,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('containers');
         Schema::dropIfExists('purchases');
         Schema::dropIfExists('buyers');
     }

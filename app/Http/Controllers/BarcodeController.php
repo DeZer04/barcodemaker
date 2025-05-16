@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Buyer;
+use App\Models\Container;
 use App\Models\Finishing;
 use App\Models\grade;
 use App\Models\item;
@@ -23,6 +24,7 @@ class BarcodeController extends Controller
             'items' => item::all(),
             'buyers' => Buyer::all(),
             'purchases' => purchase::all(),
+            'containers' => Container::all(),
             'finishings' => Finishing::all(),
             'grades' => grade::all(),
             'jenisanyams' => jenisanyam::all(),
@@ -36,6 +38,7 @@ class BarcodeController extends Controller
     {
         $request->validate([
             'name_item' => 'required|string|max:255',
+            'jeniskayu_id' => 'required|exists:jeniskayus,id',
             'grade_id' => 'required|exists:grades,id',
             'finishing_id' => 'required|exists:finishings,id',
             'jenisanyam_id' => 'required|exists:jenisanyams,id',
@@ -44,13 +47,56 @@ class BarcodeController extends Controller
 
         item::create([
             'name_item' => $request->name_item,
+            'jeniskayu_id' => $request->jeniskayu_id,
             'grade_id' => $request->grade_id,
             'finishing_id' => $request->finishing_id,
             'jenisanyam_id' => $request->jenisanyam_id,
             'warnaanyam_id' => $request->warnaanyam_id,
         ]);
 
-        return redirect()->back()->with('success', 'Item added successfully.');
+        return response()->json([
+            'name_item' => $request->name_item,
+            'jeniskayu_id' => $request->jeniskayu_id,
+            'grade_id' => $request->grade_id,
+            'finishing_id' => $request->finishing_id,
+            'jenisanyam_id' => $request->jenisanyam_id,
+            'warnaanyam_id' => $request->warnaanyam_id,
+            'success' => true,
+            'message' => 'Item created successfully.',
+        ]);
+    }
+
+    //jenisKayu
+    public function storeJenisKayu(Request $request)
+    {
+        $request->validate([
+            'name_jeniskayu' => 'required|string|max:255',
+        ]);
+
+        $jeniskayu = jeniskayu::create([
+            'name_jeniskayu' => $request->name_jeniskayu,
+        ]);
+
+        return response()->json([
+            'id' => $jeniskayu->id,
+            'name_jeniskayu' => $jeniskayu->name_jeniskayu,
+        ]);
+    }
+
+    public function destroyJenisKayu(jeniskayu $jeniskayu)
+    {
+        // Check if the jeniskayu is used in any items
+        if ($jeniskayu->items()->exists()) {
+            return redirect()->back()->with('error', 'Jenis Kayu cannot be deleted because it is associated with items.');
+        }
+
+        // Delete the jeniskayu
+        $jeniskayu->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Jenis Kayu deleted successfully.',
+        ]);
     }
 
     //grades
@@ -119,6 +165,75 @@ class BarcodeController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Finishing deleted successfully.',
+        ]);
+    }
+
+    //jenisanyam
+    public function storeJenisAnyam(Request $request)
+    {
+        $request->validate([
+            'name_jenisanyam' => 'required|string|max:255',
+        ]);
+
+        $jenisanyam = jenisanyam::create([
+            'name_jenisanyam' => $request->name_jenisanyam,
+        ]);
+
+        return response()->json([
+            'id' => $jenisanyam->id,
+            'name_jenisanyam' => $jenisanyam->name_jenisanyam,
+        ]);
+    }
+
+    public function destroyJenisAnyam(jenisanyam $jenisanyam)
+    {
+        // Check if the jenisanyam is used in any items
+        if ($jenisanyam->items()->exists()) {
+            return redirect()->back()->with('error', 'Jenis Anyam cannot be deleted because it is associated with items.');
+        }
+
+        // Delete the jenisanyam
+        $jenisanyam->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Jenis Anyam deleted successfully.',
+        ]);
+    }
+
+    //warnaanyam
+    public function storeWarnaAnyam(Request $request)
+    {
+        $request->validate([
+            'id_jenisanyam' => 'required|exists:jenisanyams,id',
+            'name_warnaanyam' => 'required|string|max:255',
+        ]);
+
+        $warnaanyam = warnaanyam::create([
+            'jenisanyam_id' => $request->id_jenisanyam,
+            'name_warnaanyam' => $request->name_warnaanyam,
+        ]);
+
+        return response()->json([
+            'id' => $warnaanyam->id,
+            'jenisanyam_id' => $warnaanyam->jenisanyam_id,
+            'name_warnaanyam' => $warnaanyam->name_warnaanyam,
+        ]);
+    }
+
+    public function destroyWarnaAnyam(warnaanyam $warnaanyam)
+    {
+        // Check if the warnaanyam is used in any items
+        if ($warnaanyam->items()->exists()) {
+            return redirect()->back()->with('error', 'Warna Anyam cannot be deleted because it is associated with items.');
+        }
+
+        // Delete the warnaanyam
+        $warnaanyam->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Warna Anyam deleted successfully.',
         ]);
     }
 

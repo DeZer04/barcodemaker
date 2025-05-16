@@ -12,10 +12,16 @@ Route::get('/barcode', [BarcodeController::class, 'index'])->name('barcode');
 
 // Item
 Route::post('/barcode/item', [BarcodeController::class, 'storeItem'])->name('barcode.items.store');
+Route::post('/barcode/jeniskayu', [BarcodeController::class, 'storeJenisKayu'])->name('barcode.jeniskayus.store');
+Route::delete('/barcode/jeniskayu/{jeniskayu}', [BarcodeController::class, 'destroyJenisKayu'])->name('barcode.jeniskayus.destroy');
 Route::post('/barcode/grade', [BarcodeController::class, 'storeGrade'])->name('barcode.grades.store');
 Route::delete('/barcode/grade/{grade}', [BarcodeController::class, 'destroyGrade'])->name('barcode.grades.destroy');
 Route::post('/barcode/finishing', [BarcodeController::class, 'storeFinishing'])->name('barcode.finishings.store');
 Route::delete('/barcode/finishing/{finishing}', [BarcodeController::class, 'destroyFinishing'])->name('barcode.finishings.destroy');
+Route::post('/barcode/jenisanyam', [BarcodeController::class, 'storeJenisAnyam'])->name('barcode.jenisanyams.store');
+Route::delete('/barcode/jenisanyam/{jenisanyam}', [BarcodeController::class, 'destroyJenisAnyam'])->name('barcode.jenisanyams.destroy');
+Route::post('/barcode/warnaanyam', [BarcodeController::class, 'storeWarnaAnyam'])->name('barcode.warnaanyams.store');
+Route::delete('/barcode/warnaanyam/{warnaanyam}', [BarcodeController::class, 'destroyWarnaAnyam'])->name('barcode.warnaanyams.destroy');
 
 // Buyer
 Route::post('/barcode/buyer', [BarcodeController::class, 'storeBuyer'])->name('barcode.buyers.store');

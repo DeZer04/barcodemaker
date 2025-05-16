@@ -18,4 +18,9 @@ class purchase extends Model
     {
         return $this->belongsTo(Buyer::class);
     }
+
+    public function containers()
+    {
+        return $this->hasMany(Container::class);
+    }
 }

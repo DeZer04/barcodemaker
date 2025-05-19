@@ -8,11 +8,17 @@ class item extends Model
 {
     protected $fillable = [
         'name_item',
+        'jeniskayu_id',
         'grade_id',
         'finishing_id',
         'jenisanyam_id',
         'warnaanyam_id'
     ];
+
+    public function jeniskayu()
+    {
+        return $this->belongsTo(jeniskayu::class);
+    }
 
     public function grade()
     {

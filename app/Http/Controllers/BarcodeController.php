@@ -19,9 +19,21 @@ class BarcodeController extends Controller
 {
     public function index()
     {
-        // Fetch all models and pass to the view
+        // Fetch all models
+        $items = item::with(['jeniskayu', 'grade', 'finishing', 'jenisanyam', 'warnaanyam'])->get();
+
+        // Tambahkan variabel namaitem untuk setiap item
+        foreach ($items as $item) {
+            $item->namaitem = $item->name_item
+                . ' Kayu ' . ($item->jeniskayu->name_jeniskayu ?? '')
+                . ' Grade ' . ($item->grade->name_grade ?? '')
+                . ' Finishing ' . ($item->finishing->name_finishing ?? '')
+                . ' Jenis anyam ' . ($item->jenisanyam->name_jenisanyam ?? '')
+                . ' Warna Anyam ' . ($item->warnaanyam->name_warnaanyam ?? '');
+        }
+
         return view('Barcode', [
-            'items' => item::all(),
+            'items' => $items,
             'buyers' => Buyer::all(),
             'purchases' => purchase::all(),
             'containers' => Container::all(),
@@ -205,12 +217,12 @@ class BarcodeController extends Controller
     public function storeWarnaAnyam(Request $request)
     {
         $request->validate([
-            'id_jenisanyam' => 'required|exists:jenisanyams,id',
+            'jenisanyam_id' => 'required|exists:jenisanyams,id',
             'name_warnaanyam' => 'required|string|max:255',
         ]);
 
         $warnaanyam = warnaanyam::create([
-            'jenisanyam_id' => $request->id_jenisanyam,
+            'jenisanyam_id' => $request->jenisanyam_id,
             'name_warnaanyam' => $request->name_warnaanyam,
         ]);
 
@@ -250,7 +262,11 @@ class BarcodeController extends Controller
             'name' => $request->name,
         ]);
 
-        return redirect()->back()->with('success', 'Buyer added successfully.');
+        return response()->json([
+            'name' => $request->name,
+            'success' => true,
+            'message' => 'Buyer created successfully.',
+        ]);
     }
 
     public function updateBuyer(Request $request, Buyer $buyer)
@@ -288,7 +304,12 @@ class BarcodeController extends Controller
             'purchaseindex' => $request->purchaseindex,
         ]);
 
-        return redirect()->back()->with('success', 'Purchase added successfully.');
+        return response()->json([
+            'buyer_id' => $request->buyer_id,
+            'purchaseindex' => $request->purchaseindex,
+            'success' => true,
+            'message' => 'Purchase created successfully.',
+        ]);
     }
 
     public function updatePurchase(Request $request, Purchase $purchase)
@@ -310,7 +331,10 @@ class BarcodeController extends Controller
     {
         $purchase->delete();
 
-        return redirect()->back()->with('success', 'Purchase deleted successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase deleted successfully.',
+        ]);
     }
 
     // =========================
@@ -319,6 +343,36 @@ class BarcodeController extends Controller
     public function getPurchasesByBuyer(Buyer $buyer)
     {
         return $buyer->purchases()->select('id', 'purchaseindex')->get();
+    }
+
+    public function storeContainer(Request $request)
+    {
+        $request->validate([
+            'buyer_id' => 'required|exists:buyers,id',
+            'containerindex' => 'required|string|max:255',
+        ]);
+
+        Container::create([
+            'buyer_id' => $request->buyer_id,
+            'containerindex' => $request->containerindex,
+        ]);
+
+        return response()->json([
+            'buyer_id' => $request->buyer_id,
+            'containerindex' => $request->containerindex,
+            'success' => true,
+            'message' => 'Container created successfully.',
+        ]);
+    }
+
+    public function destroyContainer(Container $container)
+    {
+        $container->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Container deleted successfully.',
+        ]);
     }
 
 

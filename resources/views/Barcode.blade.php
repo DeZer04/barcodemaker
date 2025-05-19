@@ -19,6 +19,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://kit.fontawesome.com/5ac6c6fc32.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -53,7 +55,7 @@
 </head>
 
 <body
-    class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-200 font-inter flex items-center justify-center min-h-screen p-4">
+    class="bg-gradient-to-br  from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-200 font-inter flex items-center justify-center min-h-screen p-4">
     <div class="max-w-4xl w-full space-y-6">
         <!-- Header -->
         <div class="text-center mb-8">
@@ -63,11 +65,13 @@
         <!-- Barcode Display -->
         <div
             class="card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col items-center">
+            <!-- Barcode Image Display -->
             <div class="bg-white p-4 rounded-lg mb-4">
-                <img src="{{ asset('path/to/default-barcode.png') }}" alt="Default Barcode" class="h-24 w-auto">
+                <img id="barcodeImage" src="{{ asset('path/to/default-barcode.png') }}" alt="Generated Barcode" class="h-24 w-auto">
             </div>
             <span
-                class="text-xl font-mono font-semibold bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md">123456789012</span>
+                id="barcodeText"
+                class="barcode-text text-xl font-mono font-semibold bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md">0000.0.00.00.000</span>
         </div>
 
         <!-- Form Grid -->
@@ -79,15 +83,14 @@
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Item</label>
                 <div class="flex flex-row gap-2">
                     <select
-                        class="select2 w-7/8 mb-4 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                        id="itemSelect">
+                        class="select2 flex-1 w-full mb-4 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-w-0"
+                        id="itemSelect"
+                        onchange="updateItem()">
                         <option value="" disabled selected>Select Item</option>
                         @foreach ($items as $item)
-                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                            <option value="{{ $item->id }}">{{ $item->namaitem }}</option>
                         @endforeach
                     </select>
-
-                    <script></script>
 
                     <button
                         class="btn-primary w-1/8 h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
@@ -96,22 +99,36 @@
                             <i class="fa-solid fa-plus"></i>
                         </span>
                     </button>
+
+                    <!-- button for managing item -->
+                    <button
+                        class="btn-primary w-1/8 h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
+                        onclick="openModal('ManageItemModal')">
+                        <span class="flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-cog"></i>
+                        </span>
+                    </button>
                 </div>
 
             </div>
 
-            <!-- Buyer and Purchase Selection -->
-            <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+            <!-- Buyer, Purchase and Container Selection -->
+            <div
+                class="card row-span-2 bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
                 <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Buyer and Purchases Selection
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+                <!-- Input Section -->
+                <div class="input-section flex flex-col gap-4 mb-4">
+                    <!-- Buyer Selection -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Buyer
                             Selection</label>
                         <div class="flex flex-row gap-2">
                             <select
                                 class="select-custom w-3/4 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                id="buyerSelect" onchange="filterPurchases()">
+                                id="buyerSelect"
+                                onchange="updateBuyer(); filterPurchases(); filterContainers();">
                                 <option value="" disabled selected>Select Buyer</option>
                                 @foreach ($buyers as $buyer)
                                     <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
@@ -126,17 +143,20 @@
                             </button>
                         </div>
                     </div>
+
+                    <!-- Purchase Selection -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Purchase
                             Selection</label>
                         <div class="flex flex-row gap-2">
                             <select
                                 class="select-custom w-3/4 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                id="purchaseSelect">
+                                id="purchaseSelect"
+                                onchange="updatePurchase()">
                                 <option value="" disabled selected>Select Purchase</option>
                                 @foreach ($purchases as $purchase)
                                     <option value="{{ $purchase->id }}" data-buyer-id="{{ $purchase->buyer_id }}">
-                                        {{ $purchase->name }}</option>
+                                        {{ $purchase->purchaseindex }}</option>
                                 @endforeach
                             </select>
                             <button
@@ -149,52 +169,207 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Line Selection -->
-        <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-            <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Line Configuration</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div class="col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Letter</label>
-                    <div class="grid grid-cols-10 gap-2">
-                        @foreach (range('A', 'Z') as $letter)
-                            <button type="button"
-                                class="letter-button text-black focus:text-black hover:text-black px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                                data-letter="{{ $letter }}" onclick="selectLetter(this)">
-                                {{ $letter }}
+                <!-- Container Section -->
+                <div class="container-section flex flex-col gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Container
+                            Selection</label>
+                        <div class="flex flex-row gap-2">
+                            <select
+                                class="select-custom w-3/4 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                                id="containerSelect"
+                                onchange="updateContainer()">
+                                <option value="" disabled selected>Select Container</option>
+                                @foreach ($containers as $container)
+                                    <option value="{{ $container->id }}" data-buyer-id="{{ $container->buyer_id }}">
+                                        {{ $container->containerindex }}</option>
+                                @endforeach
+                            </select>
+                            <button
+                                class="btn-primary w-1/4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
+                                onclick="openModal('AddContainerModal')">
+                                <span class="flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-plus"></i>
+                                </span>
                             </button>
-                        @endforeach
+                        </div>
                     </div>
                 </div>
-                <div class="col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Selected
-                        Letter</label>
-                    <input type="text" id="selectedLetter"
-                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                        readonly>
+
+            </div>
+
+            <!-- Line Selection -->
+            <div class="row-span-2 card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Line Configuration</h2>
+                <div class="flex gap-4 mb-4">
+                    <div class="">
+                        <div class="grid grid-cols-8 gap-2">
+                            @foreach (range('A', 'Z') as $letter)
+                                <button type="button"
+                                    class="letter-button text-black focus:text-black hover:text-black px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                                    data-letter="{{ $letter }}"
+                                    onclick="selectLetter(this)">
+                                    {{ $letter }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <script></script>
-            <button class="btn-primary w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-                onclick="openModal('AddLineModal')">
-                <span class="flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-plus"></i>
-                    Manage Line
-                </span>
-            </button>
+            <!-- Generate Button Section -->
+            <div class="col-start-2 row-start-3 generate-section">
+                <button
+                    onclick="generateBarcode()"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold text-lg shadow-md transition-all duration-200 transform hover:scale-[1.01]">
+                    Generate Barcode
+                </button>
+            </div>
         </div>
+    </div>
 
-        <!-- Generate Button -->
-        <button
-            class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold text-lg shadow-md transition-all duration-200 transform hover:scale-[1.01]">
-            Generate Barcode
-        </button>
+    <!-- Modal for Managing Item -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden" id="ManageItemModal">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md p-6 relative">
+            <button onclick="closeModal('ManageItemModal')"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
+                <i class="fa-solid fa-x"></i>
+            </button>
+            <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Manage Item</h3>
+            <table class="w-full text-sm text-left text-gray-700 dark:text-gray-200 border">
+                <thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <tr>
+                        <th class="px-3 py-2 border">#</th>
+                        <th class="px-3 py-2 border">Nama Item</th>
+                        <th class="px-3 py-2 border text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="manageItemTableBody">
+                    @foreach ($items as $index => $item)
+                        <tr>
+                            <td class="px-3 py-2 border">{{ $index + 1 }}</td>
+                            <td class="px-3 py-2 border" id="itemName-{{ $item->id }}">{{ $item->namaitem }}</td>
+                            <td class="px-3 py-2 border text-center">
+                                <button class="text-blue-600 hover:underline mr-2" onclick="editItem({{ $item->id }}, '{{ $item->namaitem }}')">Edit</button>
+                                <button class="text-red-600 hover:underline" onclick="deleteItem({{ $item->id }})">Delete</button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for Adding New Buyer -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden" id="AddBuyerModal">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md p-6 relative">
+            <button onclick="closeModal('AddBuyerModal')"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
+                <i class="fa-solid fa-x"></i>
+            </button>
+            <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Add New Buyer</h3>
+            <form id="addBuyerForm" class="space-y-4" method="POST" action="{{ route('barcode.buyers.store') }}">
+                @csrf
+                <div>
+                    <label for="name"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Buyer Name</label>
+                    <input type="text" id="name" name="name"
+                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                        placeholder="Enter buyer name" required>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('AddBuyerModal')"
+                        class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Adding New Purchases -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden" id="AddPurchasesModal">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md p-6 relative">
+            <button onclick="closeModal('AddPurchasesModal')"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
+                <i class="fa-solid fa-x"></i>
+            </button>
+            <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Add New Purchases</h3>
+            <form id="addPurchasesForm" class="space-y-4" method="POST"
+                action="{{ route('barcode.purchases.store') }}">
+                @csrf
+                <div>
+                    <label for="buyer_id"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nam Buyer</label>
+                    <select
+                        class="select-custom w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                        id="buyer_id" name="buyer_id" required>
+                        <option value="" disabled selected>Select Buyer</option>
+                        @foreach ($buyers as $buyer)
+                            <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="purchaseindex"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Purchases Name</label>
+                    <input type="text" id="purchaseindex" name="purchaseindex"
+                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                        placeholder="Enter purchases name" required>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('AddPurchasesModal')"
+                        class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Adding New Container -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden" id="AddContainerModal">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md p-6 relative">
+            <button onclick="closeModal('AddContainerModal')"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
+                <i class="fa-solid fa-x"></i>
+            </button>
+            <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Add New Container</h3>
+            <form id="addContainerForm" class="space-y-4" method="POST"
+                action="{{ route('barcode.containers.store') }}">
+                @csrf
+                <div>
+                    <label for="buyer_id"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nam Buyer</label>
+                    <select
+                        class="select-custom w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                        id="buyer_id" name="buyer_id" required>
+                        <option value="" disabled selected>Select Buyer</option>
+                        @foreach ($buyers as $buyer)
+                            <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="containerindex"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Container Name</label>
+                    <input type="text" id="containerindex" name="containerindex"
+                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                        placeholder="Enter container name" required>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('AddContainerModal')"
+                        class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200">Save</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Modal for Adding New Item -->
+
     <div id="AddItemModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-2xl p-6 relative">
             <button onclick="closeModal('AddItemModal')"
@@ -274,34 +449,36 @@
                     <div class="flex-1">
                         <label for="jenisanyam_id"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jenis Anyam</label>
+                        <!-- Dropdown Jenis Anyam -->
                         <select
                             class="select-custom w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                            id="jenisanyam_id" name="jenisanyam_id" required onchange="filterWarnaAnyam()">
-                            <option value="" disabled selected>Select Jenis Anyam</option>
+                            id="jenisanyam_id" name="jenisanyam_id" onchange="filterWarnaAnyam(this);">
+                            <option value="" disabled selected>Pilih Jenis Anyam</option>
                             @foreach ($jenisanyams as $jenisanyam)
                                 <option value="{{ $jenisanyam->id }}">{{ $jenisanyam->name_jenisanyam }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <button
+                    <button type="button"
                         class="btn-primary h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center transition-colors duration-200"
-                        onclick="openModal('addJenisAnyamModal')">
+                        onclick="openModal('AddJenisAnyamModal')">
                         <i class="fa-solid fa-plus"></i>
                     </button>
                 </div>
+
                 <div class="flex flex-row gap-2 items-end">
                     <div class="flex-1">
                         <label for="warnaanyam_id"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Warna Anyam</label>
                         <select
                             class="select-custom w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                            id="warnaanyam_id" name="warnaanyam_id" required>
-                            <option value="" disabled selected>Select Warna Anyam</option>
+                            id="warnaanyam_id" name="warnaanyam_id">
+                            <option value="" disabled selected>Pilih Warna Anyam</option>
                             @foreach ($warnaanyams as $warnaanyam)
-                                <option value="{{ $warnaanyam->id }}"
-                                    data-jenisanyam-id="{{ $warnaanyam->jenisanyam_id }}">
-                                    {{ $warnaanyam->name_warnaanyam }}</option>
+                                <option value="{{ $warnaanyam->id }}" data-jenisanyam-id="{{ $warnaanyam->jenisanyam_id }}">
+                                    {{ $warnaanyam->name_warnaanyam }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -383,9 +560,68 @@
             </form>
         </div>
     </div>
+
     <!-- Modal for Adding New Warna Anyam -->
     <div id="AddWarnaAnyamModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
-        <div class="bg-white"></div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md p-6 relative">
+            <button onclick="closeModal('AddWarnaAnyamModal')"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
+                <i class="fa-solid fa-x"></i>
+            </button>
+            <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Add New Warna Anyam</h3>
+            <form id="addWarnaAnyamForm" class="space-y-4" method="POST"
+                action="{{ route('barcode.warnaanyams.store') }}">
+                @csrf
+                <div>
+                    <label for="jenisanyam_id"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jenis Anyam</label>
+                    <select
+                        class="select-custom w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                        id="jenisanyam_id" name="jenisanyam_id" required>
+                        <option value="" disabled selected>Select Jenis Anyam</option>
+                        @foreach ($jenisanyams as $jenisanyam)
+                            <option value="{{ $jenisanyam->id }}">{{ $jenisanyam->name_jenisanyam }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="name_warnaanyam"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Warna Anyam
+                        Name</label>
+                    <input type="text" id="name_warnaanyam" name="name_warnaanyam"
+                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                        placeholder="Enter warna anyam name" required>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('AddWarnaAnyamModal')"
+                        class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200">Save</button>
+                </div>
+            </form>
+            <div class="my-4 border-t border-gray-300 dark:border-gray-600"></div>
+            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Warna Anyam List</h3>
+            <ul id="warnaanyamList" class="space-y-2">
+                @foreach ($warnaanyams as $warnaanyam)
+                    <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-2 rounded-lg"
+                        data-id="{{ $warnaanyam->id }}">
+                        <span>
+                            {{ $warnaanyam->name_warnaanyam }}
+                            <span class="text-xs text-gray-500 ml-2">
+                                (@php
+                                    $jenis = $jenisanyams->firstWhere('id', $warnaanyam->jenisanyam_id);
+                                @endphp
+                                {{ $jenis ? $jenis->name_jenisanyam : 'Unknown' }})
+                            </span>
+                        </span>
+                        <button type="button" onclick="deleteWarnaAnyam('{{ $warnaanyam->id }}')"
+                            class="text-red-600 hover:text-red-800 transition-colors duration-200">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
     </div>
 
     <!-- Modal for Adding New Finishing -->
@@ -490,20 +726,33 @@
             $('#itemSelect').select2({
                 placeholder: "Select Item",
                 allowClear: true,
-                width: '100%'
+                height: 100,
             });
         });
 
-        function selectLetter(button) {
-            const selectedLetter = button.getAttribute('data-letter');
-            document.getElementById('selectedLetter').value = selectedLetter;
+        function generateBarcode() {
+            const barcodeTextSpan = document.getElementById('barcodeText');
+            const rawCode = barcodeTextSpan.textContent.trim();
+            const code = rawCode.replace(/\./g, ''); // Hilangkan titik
 
-            // Highlight selected button
-            document.querySelectorAll('.letter-button').forEach(btn => {
-                btn.classList.remove('bg-blue-500', 'text-black');
-                btn.classList.add('bg-white', 'dark:bg-gray-700', 'text-black');
+            // Buat elemen SVG sementara
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+            // Buat barcode ke SVG
+            JsBarcode(svg, code, {
+                format: "CODE128",
+                displayValue: true,
+                fontSize: 18,
+                height: 80
             });
-            button.classList.add('bg-blue-500', 'text-black');
+
+            // Convert SVG ke image base64 dan tampilkan
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(svg);
+            const encodedData = 'data:image/svg+xml;base64,' + btoa(svgString);
+
+            const img = document.getElementById('barcodeImage');
+            img.src = encodedData;
         }
 
         function openModal(modalId) {
@@ -512,7 +761,7 @@
                 modal.classList.remove('hidden');
                 document.body.classList.add('overflow-hidden');
             }
-        }
+        };
 
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
@@ -520,6 +769,393 @@
                 modal.classList.add('hidden');
                 document.body.classList.remove('overflow-hidden');
             }
+        };
+
+        function updateBarcodePart(index, value, length) {
+            const barcodeSpan = document.getElementById('barcodeText');
+            let parts = barcodeSpan.textContent.trim().split('.');
+
+            // Pastikan array cukup panjang
+            while (parts.length < 5) parts.push('00');
+
+            parts[index] = value.toString().padStart(length, '0');
+            barcodeSpan.textContent = parts.join('.');
+        }
+
+        function updateItem() {
+            const itemSelect = document.getElementById('itemSelect');
+            const itemId = itemSelect.value;
+            if (itemId) updateBarcodePart(0, itemId, 4); // item di index ke-0
+        }
+
+        function updateBuyer() {
+            const buyerSelect = document.getElementById('buyerSelect');
+            const buyerId = buyerSelect.value;
+            if (buyerId) updateBarcodePart(2, buyerId, 2); // buyer di index ke-2
+        }
+
+        function selectLetter(button) {
+            const selectedLetter = button.getAttribute('data-letter');
+            updateBarcodePart(1, selectedLetter, 1); // index ke-1 adalah bagian 'line'
+        }
+
+        function updatePurchase() {
+            const purchaseSelect = document.getElementById('purchaseSelect');
+            const selectedOption = purchaseSelect.options[purchaseSelect.selectedIndex];
+            const purchaseIndex = selectedOption.textContent.trim(); // This is the displayed text (purchaseindex)
+
+            if (purchaseIndex) updateBarcodePart(3, purchaseIndex, 2); // index 3 for purchase
+        }
+
+        function updateContainer() {
+            const containerSelect = document.getElementById('containerSelect');
+            const selectedOption = containerSelect.options[containerSelect.selectedIndex];
+            const containerIndex = selectedOption.textContent.trim(); // This is the displayed text (containerindex)
+
+            if (containerIndex) updateBarcodePart(4, containerIndex, 2); // index 4 for container
+        }
+
+        function filterPurchases() {
+            const buyerSelect = document.getElementById('buyerSelect');
+            const selectedBuyerId = buyerSelect.value;
+            const purchaseSelect = document.getElementById('purchaseSelect');
+
+            // Reset pilihan Purchase ke default
+            purchaseSelect.value = "";
+
+            // Tampilkan semua opsi dulu
+            Array.from(purchaseSelect.options).forEach(option => {
+                if (option.value === "") {
+                    option.hidden = false; // Biarkan placeholder terlihat
+                } else {
+                    option.hidden = true; // Sembunyikan dulu semua
+                }
+            });
+
+            // Tampilkan hanya opsi Purchase dengan buyer_id yang sesuai
+            Array.from(purchaseSelect.options).forEach(option => {
+                if (option.dataset.buyerId === selectedBuyerId) {
+                    option.hidden = false;
+                }
+            });
+        }
+
+        function filterContainers() {
+            const buyerSelect = document.getElementById('buyerSelect');
+            const containerSelect = document.getElementById('containerSelect');
+            const selectedBuyerId = buyerSelect.value;
+
+            // Reset selected value
+            containerSelect.value = "";
+
+            // Tampilkan semua opsi dahulu
+            Array.from(containerSelect.options).forEach(option => {
+                const buyerId = option.getAttribute('data-buyer-id');
+
+                if (!buyerId || buyerId === selectedBuyerId) {
+                    option.hidden = false;
+                } else {
+                    option.hidden = true;
+                }
+            });
+        }
+
+        // Buyer Form Handling
+        document.getElementById('addBuyerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...';
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.message || "Failed to add buyer");
+                });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Add to select dropdown
+                const buyerSelect = document.getElementById('buyerSelect');
+                const newOption = document.createElement('option');
+                newOption.value = data.id;
+                newOption.textContent = data.name;
+                newOption.selected = true;
+                buyerSelect.appendChild(newOption);
+
+                // Reset form and close modal
+                form.reset();
+                closeModal('AddBuyerModal');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message || 'An error occurred while adding the buyer');
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+            });
+        });
+
+        // Purchases Form Handling
+        document.getElementById('addPurchasesForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...';
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || "Failed to add purchases");
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Add to select dropdown
+                const purchaseSelect = document.getElementById('purchaseSelect');
+                const newOption = document.createElement('option');
+                newOption.value = data.id;
+                newOption.textContent = data.purchaseindex;
+                newOption.dataset.buyerId = data.buyer_id; // Set buyer_id as a data attribute
+                newOption.selected = true;
+                purchaseSelect.appendChild(newOption);
+
+                // Reset form and close modal
+                form.reset();
+                closeModal('AddPurchasesModal');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message || 'An error occurred while adding the purchases');
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+            });
+        });
+
+        // Container Form Handling
+        document.getElementById('addContainerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...';
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.message || "Failed to add container");
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Add to select dropdown
+                const containerSelect = document.getElementById('container_id');
+                const newOption = document.createElement('option');
+                newOption.value = data.id;
+                newOption.textContent = data.name_container;
+                newOption.selected = true;
+                containerSelect.appendChild(newOption);
+
+                // Reset form and close modal
+                form.reset();
+                closeModal('AddContainerModal');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message || 'An error occurred while adding the container');
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.textContent = originalButtonText;
+            });
+        });
+
+        // Warna Anyam Form Handling
+        document.getElementById('addWarnaAnyamForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...';
+
+            fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || "Failed to add warna anyam");
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Add to select dropdown
+                    const warnaAnyamSelect = document.getElementById('warnaanyam_id');
+                    const newOption = document.createElement('option');
+                    newOption.value = data.id;
+                    newOption.textContent = data.name_warnaanyam;
+                    newOption.selected = true;
+                    warnaAnyamSelect.appendChild(newOption);
+
+                    // Reset form and close modal
+                    form.reset();
+                    closeModal('AddWarnaAnyamModal');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(error.message || 'An error occurred while adding the warna anyam');
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalButtonText;
+                });
+        });
+
+        // Filter Warna Anyam based on Jenis Anyam
+        function filterWarnaAnyam(selectElement) {
+            const selectedJenisAnyamId = selectElement.value;
+            const warnaAnyamSelect = document.getElementById('warnaanyam_id');
+
+            if (!selectedJenisAnyamId) {
+                console.log('Belum ada Jenis Anyam yang dipilih.');
+                return;
+            }
+
+            console.log('Jenis Anyam selected:', selectedJenisAnyamId);
+
+            // Reset dropdown Warna Anyam
+            warnaAnyamSelect.value = "";
+
+            // Sembunyikan semua opsi
+            Array.from(warnaAnyamSelect.options).forEach(option => {
+                if (option.value === "") {
+                    option.style.display = 'block'; // biarkan default
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+
+            // Tampilkan yang sesuai
+            Array.from(warnaAnyamSelect.options).forEach(option => {
+                if (option.dataset.jenisanyamId === selectedJenisAnyamId) {
+                    option.style.display = 'block';
+                }
+            });
+        }
+
+        //delete warna anyam
+        function deleteWarnaAnyam(id) {
+            // Show confirmation modal instead of confirm()
+            const confirmModal = document.createElement('div');
+            confirmModal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/40';
+            confirmModal.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm p-6 relative text-center">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Are you sure you want to delete this warna anyam?</h3>
+                    <div class="flex justify-center gap-4">
+                        <button id="cancelDeleteWarnaAnyam" class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
+                        <button id="confirmDeleteWarnaAnyam" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors duration-200">Delete</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmModal);
+            document.body.classList.add('overflow-hidden');
+
+            document.getElementById('cancelDeleteWarnaAnyam').onclick = function() {
+                document.body.removeChild(confirmModal);
+                document.body.classList.remove('overflow-hidden');
+            };
+
+            document.getElementById('confirmDeleteWarnaAnyam').onclick = function() {
+                fetch(`/barcode/warnaanyam/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content')
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Failed to delete warna anyam");
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Remove from select dropdown
+                        const warnaAnyamSelect = document.getElementById('warnaanyam_id');
+                        const optionToRemove = warnaAnyamSelect.querySelector(`option[value="${id}"]`);
+                        if (optionToRemove) {
+                            warnaAnyamSelect.removeChild(optionToRemove);
+                        }
+
+                        // Remove from list
+                        const listItem = document
+                            .querySelector(`li[data-id="${id}"]`);
+                        if (listItem) {
+                            listItem.parentNode.removeChild(listItem);
+                        }
+                        // Close confirmation modal
+                        document.body.removeChild(confirmModal);
+                        document.body.classList.remove('overflow-hidden');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert(error.message || 'An error occurred while deleting the warna anyam');
+                    });
+            };
         }
 
         // Jenis Kayu Form Handling
@@ -561,7 +1197,7 @@
 
                     // Reset form and close modal
                     form.reset();
-                    closeAddJenisKayuModal();
+                    closeModal('AddJenisKayuModal');
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -662,17 +1298,29 @@
                     return response.json();
                 })
                 .then(data => {
-                    // Add to select dropdown
                     const jenisAnyamSelect = document.getElementById('jenisanyam_id');
+
+                    // Buat dan tambahkan opsi baru
                     const newOption = document.createElement('option');
                     newOption.value = data.id;
                     newOption.textContent = data.name_jenisanyam;
                     newOption.selected = true;
+
+                    // Tambahkan ke dropdown
                     jenisAnyamSelect.appendChild(newOption);
 
-                    // Reset form and close modal
+                    // Hapus atribut "selected" dari opsi default jika ada
+                    const defaultOption = jenisAnyamSelect.querySelector('option[value=""]');
+                    if (defaultOption) {
+                        defaultOption.selected = false;
+                    }
+
+                    // Trigger event onchange untuk update warna anyam
+                    filterWarnaAnyam(jenisAnyamSelect);
+
+                    // Reset form dan tutup modal
                     form.reset();
-                    closeAddJenisAnyamModal();
+                    closeModal('AddJenisAnyamModal');
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -746,7 +1394,6 @@
             };
         }
 
-
         // Grade Form Handling
         document.getElementById('addGradeForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -809,7 +1456,7 @@
 
                     // Reset form and close modal
                     form.reset();
-                    closeAddGradeModal();
+                    closeModal('AddGradeModal');
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -954,7 +1601,7 @@
 
                     // Reset form and close modal
                     form.reset();
-                    closeAddFinishingModal();
+                    closeModal('AddFinishingModal');
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -1060,7 +1707,7 @@
                     // Handle success (you might want to refresh the items list or show a success message)
                     alert('Item added successfully');
                     form.reset();
-                    closeAddItemModal();
+                    closeModal('AddItemModal');
 
                     // Optionally refresh the page or update the items list
                     window.location.reload();

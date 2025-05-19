@@ -11,7 +11,7 @@ class purchase extends Model
 
     protected $fillable = [
         'buyer_id',
-        'purchase_index'
+        'purchaseindex'
     ];
 
     public function buyer()

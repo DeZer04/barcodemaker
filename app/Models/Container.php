@@ -10,12 +10,12 @@ class Container extends Model
     use HasFactory;
 
     protected $fillable = [
-        'purchase_id',
+        'buyer_id',
         'containerindex',
     ];
 
-    public function purchase()
+    public function buyer()
     {
-        return $this->belongsTo(purchase::class);
+        return $this->belongsTo(Buyer::class);
     }
 }

@@ -26,7 +26,7 @@ return new class extends Migration
 
         Schema::create('containers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('purchase_id')->constrained('purchases')->onDelete('cascade');
+            $table->foreignId('buyer_id')->constrained('buyers')->onDelete('cascade');
             $table->string('containerindex');
             $table->timestamps();
         });

@@ -15,4 +15,8 @@ class origin extends Model
     {
         return $this->hasMany(item::class);
     }
+
+    protected $casts = [
+        'kode_origin' => 'array',
+    ];
 }

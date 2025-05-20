@@ -28,6 +28,8 @@ Route::post('/barcode/purchase', [BarcodeController::class, 'storePurchase'])->n
 Route::delete('/barcode/purchase/{purchase}', [BarcodeController::class, 'destroyPurchase'])->name('barcode.purchases.destroy');
 Route::post('/barcode/container', [BarcodeController::class, 'storeContainer'])->name('barcode.containers.store');
 Route::delete('/barcode/container/{container}', [BarcodeController::class, 'destroyContainer'])->name('barcode.containers.destroy');
+Route::post('/barcode/origin', [BarcodeController::class, 'storeOrigin'])->name('barcode.origins.store');
+Route::delete('/barcode/origin/{origin}', [BarcodeController::class, 'destroyOrigin'])->name('barcode.origins.destroy');
 
 // Buyer
 Route::post('/barcode/buyer', [BarcodeController::class, 'storeBuyer'])->name('barcode.buyers.store');

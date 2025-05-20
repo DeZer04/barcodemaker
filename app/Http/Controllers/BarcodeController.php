@@ -375,5 +375,35 @@ class BarcodeController extends Controller
         ]);
     }
 
+    public function storeOrigin(Request $request)
+    {
+        Log::info('Origin form submitted', $request->all());
+
+        $request->validate([
+            'name_origin' => 'required|string|max:255',
+            'letters' => 'required|string', // expecting comma-separated values
+        ]);
+
+        $lettersArray = explode(',', $request->letters);
+
+        Log::info('Letters Array', $lettersArray);
+
+        if (count($lettersArray) > 3) {
+            return back()->withErrors(['letters' => 'You can only select up to 3 letters.']);
+        }
+
+        // Save to database
+        Origin::create([
+            'name_origin' => $request->name_origin,
+            'kode_origin' => $lettersArray, // Automatically stored as JSON
+        ]);
+
+        return response()->json([
+            'name_origin' => $request->name_origin,
+            'kode_origin' => $lettersArray,
+            'success' => true,
+            'message' => 'Origin created successfully.',
+        ]);
+    }
 
 }

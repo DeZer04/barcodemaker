@@ -71,7 +71,12 @@
                     class="h-24 w-auto">
             </div>
             <span id="barcodeText"
-                class="barcode-text text-xl font-mono font-semibold bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md">0000.0.00.00.000</span>
+                class="barcode-text text-xl font-mono font-semibold bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md hidden">0000.0.00.00.000</span>
+            <button
+                onclick="printBarcode()"
+                class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold shadow transition-all duration-200">
+                <i class="fa-solid fa-print mr-2"></i> Print Barcode
+            </button>
         </div>
 
         <!-- Form Grid -->
@@ -81,34 +86,41 @@
                 <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Item Selection</h2>
 
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Item</label>
-                <div class="flex flex-row gap-2">
-                    <select
-                        class="select2 flex-1 w-full mb-4 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-w-0"
-                        id="itemSelect" onchange="updateItem()">
-                        <option value="" disabled selected>Select Item</option>
-                        @foreach ($items as $item)
-                            <option value="{{ $item->id }}">{{ $item->namaitem }}</option>
-                        @endforeach
-                    </select>
+                <div class="flex flex-col gap-2">
+                    <div class="flex flex-row w-full">
+                        <select
+                            class="select2 flex-1 w-full mb-4 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-w-0"
+                            id="itemSelect" onchange="updateItem()">
+                            <option value="" disabled selected>Select Item</option>
+                            @foreach ($items as $item)
+                                <option value="{{ $item->id }}">{{ $item->namaitem }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                    <button
-                        class="btn-primary w-1/8 h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-                        onclick="openModal('AddItemModal')">
-                        <span class="flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-plus"></i>
-                        </span>
-                    </button>
-
-                    <!-- button for managing item -->
-                    <button
-                        class="btn-primary w-1/8 h-10 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-                        onclick="openModal('ManageItemModal')">
-                        <span class="flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-list"></i>
-                        </span>
-                    </button>
+                    <div class="flex flex-row h-10 space-x-4">
+                        <div class="flex w-1/2">
+                            <button
+                                class="btn-primary w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
+                                onclick="openModal('AddItemModal')">
+                                <span class="flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-plus"></i>
+                                    Tambah Item
+                                </span>
+                            </button>
+                        </div>
+                        <div class="flex w-1/2">
+                            <button
+                                class="btn-primary w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
+                                onclick="openModal('ManageItemModal')">
+                                <span class="flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-list"></i>
+                                    Manage Item
+                                </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-
             </div>
 
             <!-- Buyer, Purchase and Container Selection -->
@@ -283,7 +295,7 @@
                                     } elseif (is_array($kode)) {
                                         echo implode('/', $kode);
                                     } else {
-                                        echo e((string)$kode);
+                                        echo e((string) $kode);
                                     }
                                 @endphp
                             </td>
@@ -472,7 +484,8 @@
             <div class="mb-4">
                 <h2 class="text-xl font-semibold mb-2">Add Origin Line</h2>
                 <label for="name_origin" class="block text-sm font-medium text-gray-700">Name</label>
-                <input type="text" id="name_origin" name="name_origin" class="w-full mt-1 border rounded px-3 py-2" />
+                <input type="text" id="name_origin" name="name_origin"
+                    class="w-full mt-1 border rounded px-3 py-2" />
             </div>
 
             <div class="placeholder">Letter: </div>
@@ -884,6 +897,51 @@
 
             const img = document.getElementById('barcodeImage');
             img.src = encodedData;
+        }
+
+        function printBarcode() {
+            const barcodeImg = document.getElementById('barcodeImage');
+            const printWindow = window.open('', '_blank', 'width=500,height=300');
+            printWindow.document.write(`
+            <html>
+            <head>
+                <title>Print Barcode</title>
+                <style>
+                @media print {
+                    html, body { margin: 0 !important; padding: 0 !important; }
+                    body { width: 100vw; height: 100vh; }
+                }
+                html, body {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    width: 100vw;
+                    height: 100vh;
+                }
+                body {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    width: 100vw;
+                    background: #fff;
+                }
+                .barcode-img {
+                    height: 2cm;
+                    width: 5cm;
+                    object-fit: contain;
+                    display: block;
+                }
+                </style>
+            </head>
+            <body>
+                <img src="${barcodeImg.src}" class="barcode-img" />
+                <script>
+                window.onload = function() { window.print(); window.close(); }
+                <\/script>
+            </body>
+            </html>
+            `);
+            printWindow.document.close();
         }
 
         function searchItemTable() {

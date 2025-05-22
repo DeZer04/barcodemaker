@@ -201,7 +201,7 @@
                 <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Line Configuration</h2>
                 <div class="flex flex-col gap-4 mb-4">
                     <div class="">
-                        <div class="grid grid-cols-8 gap-2">
+                        <div class="grid grid-cols-7 gap-2">
                             @foreach (range('A', 'Z') as $letter)
                                 <button type="button"
                                     class="letter-button text-black focus:text-black hover:text-black px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
@@ -211,16 +211,29 @@
                             @endforeach
                         </div>
                     </div>
-                    <div class="button">
-                        <button type="button"
-                            class="btn-primary w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-                            onclick="openModal('AddLineModal')">
-                            <span class="flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-industry"></i>
-                                Manage Line
-                            </span>
-                        </button>
+                    <div class="flex flex-row space-x-4 h-10">
+                        <div class="w-1/2 h-full flex">
+                            <button type="button"
+                                class="btn-primary w-full h-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center"
+                                onclick="openModal('AddLineModal')">
+                                <span class="flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-plus"></i>
+                                    Add Line
+                                </span>
+                            </button>
+                        </div>
+                        <div class="w-1/2 h-full flex">
+                            <button type="button"
+                                class="btn-primary w-full h-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center"
+                                onclick="openModal('LineManageModal')">
+                                <span class="flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-industry"></i>
+                                    Manage Line
+                                </span>
+                            </button>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
@@ -231,6 +244,57 @@
                     Generate Barcode
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal for show line -->
+    <div id="LineManageModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md p-6 relative">
+            <button onclick="closeModal('LineManageModal')"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
+                <i class="fa-solid fa-x"></i>
+            </button>
+            <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Manage Line</h3>
+            <table class="w-full text-sm text-left text-gray-700 dark:text-gray-200 border">
+                <thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                    <tr>
+                        <th class="px-3 py-2 border">#</th>
+                        <th class="px-3 py-2 border">Nama Line</th>
+                        <th class="px-3 py-2 border">Kode Line</th>
+                        <th class="px-3 py-2 border text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="lineTableBody">
+                    @foreach ($origins as $index => $line)
+                        <tr>
+                            <td class="px-3 py-2 border">{{ $index + 1 }}</td>
+                            <td class="px-3 py-2 border" id="lineName-{{ $line->id }}">{{ $line->name_origin }}
+                            </td>
+                            <td class="px-3 py-2 border">
+                                @php
+                                    $kode = $line->kode_origin;
+                                    if (is_string($kode)) {
+                                        $parsed = json_decode($kode, true);
+                                        if (json_last_error() === JSON_ERROR_NONE && is_array($parsed)) {
+                                            echo implode('/', $parsed);
+                                        } else {
+                                            echo e($kode);
+                                        }
+                                    } elseif (is_array($kode)) {
+                                        echo implode('/', $kode);
+                                    } else {
+                                        echo e((string)$kode);
+                                    }
+                                @endphp
+                            </td>
+                            <td class="px-3 py-2 border text-center">
+                                <button class="text-red-600 hover:underline"
+                                    onclick="deleteLine({{ $line->id }})">Delete</button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 

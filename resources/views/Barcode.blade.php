@@ -22,28 +22,10 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
 
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        .card {
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .card:hover {
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .btn-primary {
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
         .select-custom {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
             background-position: right 0.5rem center;
@@ -56,206 +38,205 @@
 
 <body
     class="bg-gradient-to-br  from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-800 dark:text-gray-200 font-inter flex items-center justify-center min-h-screen p-4">
-    <div class="max-w-4xl w-full space-y-6">
+    <div class="max-w-4xl mx-auto space-y-6">
         <!-- Header -->
-        <div class="text-center mb-8">
+        <div class="text-center">
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Barcode Generator</h1>
+            <p class="text-gray-600 dark:text-gray-400">Create and manage product barcodes efficiently</p>
         </div>
 
-        <!-- Barcode Display -->
-        <div
-            class="card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col items-center">
-            <!-- Barcode Image Display -->
-            <div class="bg-white p-4 rounded-lg mb-4">
-                <img id="barcodeImage" src="{{ asset('path/to/default-barcode.png') }}" alt="Generated Barcode"
-                    class="h-24 w-auto">
-            </div>
-            <span id="barcodeText"
-                class="barcode-text text-xl font-mono font-semibold bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-md hidden">0000.0.00.00.000</span>
-            <button
-                onclick="printBarcode()"
-                class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold shadow transition-all duration-200">
-                <i class="fa-solid fa-print mr-2"></i> Print Barcode
-            </button>
-        </div>
-
-        <!-- Form Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Item Selection -->
-            <div class="card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-                <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Item Selection</h2>
-
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Item</label>
-                <div class="flex flex-col gap-2">
-                    <div class="flex flex-row w-full">
-                        <select
-                            class="select2 flex-1 w-full mb-4 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none min-w-0"
-                            id="itemSelect" onchange="updateItem()">
-                            <option value="" disabled selected>Select Item</option>
-                            @foreach ($items as $item)
-                                <option value="{{ $item->id }}">{{ $item->namaitem }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="flex flex-row h-10 space-x-4">
-                        <div class="flex w-1/2">
-                            <button
-                                class="btn-primary w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-                                onclick="openModal('AddItemModal')">
-                                <span class="flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-plus"></i>
-                                    Tambah Item
-                                </span>
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Left Column -->
+            <div class="space-y-6">
+                <!-- Item Selection Card -->
+                <div
+                    class="card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Item Selection</h2>
+                        <div class="flex space-x-2">
+                            <button onclick="openModal('AddItemModal')"
+                                class="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                            <button onclick="openModal('ManageItemModal')"
+                                class="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                <i class="fa-solid fa-list"></i>
                             </button>
                         </div>
-                        <div class="flex w-1/2">
-                            <button
-                                class="btn-primary w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-                                onclick="openModal('ManageItemModal')">
-                                <span class="flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-list"></i>
-                                    Manage Item
-                                </span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select
+                                Item</label>
+                            <select id="itemSelect" onchange="updateItem()"
+                                class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                                <option value="" disabled selected>Choose an item...</option>
+                                @foreach ($items as $item)
+                                    <option value="{{ $item->id }}">{{ $item->namaitem }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Line Configuration Card -->
+                <div
+                    class="card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Line Configuration</h2>
+                        <div class="flex space-x-2">
+                            <button onclick="openModal('AddLineModal')"
+                                class="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                <i class="fa-solid fa-plus"></i>
                             </button>
+                            <button onclick="openModal('LineManageModal')"
+                                class="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                                <i class="fa-solid fa-industry"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select
+                                Line</label>
+                            <div class="grid grid-cols-5 gap-2">
+                                @foreach (range('A', 'Z') as $letter)
+                                    <button type="button"
+                                        class="letter-button px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                        data-letter="{{ $letter }}" onclick="selectLetter(this)">
+                                        {{ $letter }}
+                                    </button>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Buyer, Purchase and Container Selection -->
-            <div
-                class="card row-span-2 bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-                <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Buyer and Purchases Selection
-                </h2>
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- Buyer/Purchase/Container Card -->
+                <div
+                    class="card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Order Information</h2>
 
-                <!-- Input Section -->
-                <div class="input-section flex flex-col gap-4 mb-4">
-                    <!-- Buyer Selection -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Buyer
-                            Selection</label>
-                        <div class="flex flex-row gap-2">
-                            <select
-                                class="select-custom w-3/4 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                id="buyerSelect" onchange="updateBuyer(); filterPurchases(); filterContainers();">
-                                <option value="" disabled selected>Select Buyer</option>
-                                @foreach ($buyers as $buyer)
-                                    <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
-                                @endforeach
-                            </select>
-                            <button
-                                class="btn-primary w-1/4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-                                onclick="openModal('AddBuyerModal')">
-                                <span class="flex items-center justify-center gap-2">
+                    <div class="space-y-4">
+                        <!-- Buyer Selection -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Buyer</label>
+                            <div class="flex space-x-2">
+                                <select id="buyerSelect"
+                                    onchange="updateBuyer(); filterPurchases(); filterContainers();"
+                                    class="flex-1 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                                    <option value="" disabled selected>Select buyer...</option>
+                                    @foreach ($buyers as $buyer)
+                                        <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button onclick="openModal('AddBuyerModal')"
+                                    class="px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
                                     <i class="fa-solid fa-plus"></i>
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Purchase Selection -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Purchase
-                            Selection</label>
-                        <div class="flex flex-row gap-2">
-                            <select
-                                class="select-custom w-3/4 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                id="purchaseSelect" onchange="updatePurchase()">
-                                <option value="" disabled selected>Select Purchase</option>
-                                @foreach ($purchases as $purchase)
-                                    <option value="{{ $purchase->id }}" data-buyer-id="{{ $purchase->buyer_id }}">
-                                        {{ $purchase->purchaseindex }}</option>
-                                @endforeach
-                            </select>
-                            <button
-                                class="btn-primary w-1/4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-                                onclick="openModal('AddPurchasesModal')">
-                                <span class="flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-plus"></i>
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Container Section -->
-                <div class="container-section flex flex-col gap-4 mb-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Container
-                            Selection</label>
-                        <div class="flex flex-row gap-2">
-                            <select
-                                class="select-custom w-3/4 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                                id="containerSelect" onchange="updateContainer()">
-                                <option value="" disabled selected>Select Container</option>
-                                @foreach ($containers as $container)
-                                    <option value="{{ $container->id }}" data-buyer-id="{{ $container->buyer_id }}">
-                                        {{ $container->containerindex }}</option>
-                                @endforeach
-                            </select>
-                            <button
-                                class="btn-primary w-1/4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
-                                onclick="openModal('AddContainerModal')">
-                                <span class="flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-plus"></i>
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Line Selection -->
-            <div
-                class="row-span-2 card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-                <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Line Configuration</h2>
-                <div class="flex flex-col gap-4 mb-4">
-                    <div class="">
-                        <div class="grid grid-cols-7 gap-2">
-                            @foreach (range('A', 'Z') as $letter)
-                                <button type="button"
-                                    class="letter-button text-black focus:text-black hover:text-black px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                                    data-letter="{{ $letter }}" onclick="selectLetter(this)">
-                                    {{ $letter }}
                                 </button>
-                            @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Purchase Selection -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Purchase
+                                Order</label>
+                            <div class="flex space-x-2">
+                                <select id="purchaseSelect" onchange="updatePurchase()"
+                                    class="flex-1 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                                    <option value="" disabled selected>Select purchase order...</option>
+                                    @foreach ($purchases as $purchase)
+                                        <option value="{{ $purchase->id }}" data-buyer-id="{{ $purchase->buyer_id }}">
+                                            {{ $purchase->purchaseindex }}</option>
+                                    @endforeach
+                                </select>
+                                <button onclick="openModal('AddPurchasesModal')"
+                                    class="px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Container Selection -->
+                        <div>
+                            <label
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Container</label>
+                            <div class="flex space-x-2">
+                                <select id="containerSelect" onchange="updateContainer()"
+                                    class="flex-1 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                                    <option value="" disabled selected>Select container...</option>
+                                    @foreach ($containers as $container)
+                                        <option value="{{ $container->id }}"
+                                            data-buyer-id="{{ $container->buyer_id }}">
+                                            {{ $container->containerindex }}</option>
+                                    @endforeach
+                                </select>
+                                <button onclick="openModal('AddContainerModal')"
+                                    class="px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex flex-row space-x-4 h-10">
-                        <div class="w-1/2 h-full flex">
-                            <button type="button"
-                                class="btn-primary w-full h-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center"
-                                onclick="openModal('AddLineModal')">
-                                <span class="flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-plus"></i>
-                                    Add Line
-                                </span>
-                            </button>
-                        </div>
-                        <div class="w-1/2 h-full flex">
-                            <button type="button"
-                                class="btn-primary w-full h-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium flex items-center justify-center"
-                                onclick="openModal('LineManageModal')">
-                                <span class="flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-industry"></i>
-                                    Manage Line
-                                </span>
-                            </button>
-                        </div>
+                </div>
+
+                <!-- Barcode Display Card -->
+                <div
+                    class="card bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Barcode Preview</h2>
+                        <button onclick="printBarcode()"
+                            class="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200">
+                            <i class="fa-solid fa-print mr-2"></i> Print
+                        </button>
                     </div>
 
+                    <div class="space-y-4">
+                        <!-- Barcode Image -->
+                        <div
+                            class="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 flex justify-center">
+                            <img id="barcodeImage" src="{{ asset('path/to/default-barcode.png') }}"
+                                alt="Generated Barcode" class="h-32 w-auto">
+                        </div>
+
+                        <!-- Barcode Text -->
+                        <div id="barcodeText"
+                            class="text-center font-mono text-xl font-semibold bg-gray-100 dark:bg-gray-700 px-4 py-3 rounded-lg hidden">
+                            0000.0.00.00.000
+                        </div>
+
+                        <!-- Search Barcode -->
+                        <div class="flex space-x-2">
+                            <input type="text" id="searchBarcodeInput"
+                                placeholder="Search barcode (e.g. 0000.0.00.00.000)"
+                                class="flex-1 px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200">
+                            <button onclick="searchBarcode()"
+                                class="px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200">
+                                <i class="fa-solid fa-search"></i>
+                            </button>
+                        </div>
+
+                        <!-- Results Area -->
+                        <div id="resultArea"
+                            class="text-sm text-gray-600 dark:text-gray-400 p-2 rounded bg-gray-50 dark:bg-gray-700/50">
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Generate Button Section -->
-            <div class="col-start-2 row-start-3 generate-section">
-                <button onclick="generateBarcode()"
-                    class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-semibold text-lg shadow-md transition-all duration-200 transform hover:scale-[1.01]">
-                    Generate Barcode
-                </button>
-            </div>
+        <!-- Generate Button -->
+        <div class="pt-2">
+            <button onclick="generateBarcode()"
+                class="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-3.5 rounded-xl font-semibold text-lg shadow-md transition-all duration-200 transform hover:scale-[1.01] active:scale-95">
+                Generate Barcode
+            </button>
         </div>
     </div>
 
@@ -874,6 +855,42 @@
             });
         });
 
+        function searchBarcode() {
+            const input = document.getElementById('searchBarcodeInput');
+            const barcodeText = input.value.trim();
+            if (!barcodeText) {
+                alert('Masukkan kode barcode yang ingin dicari!');
+                return;
+            }
+
+            fetch(`/barcode/reverse-search?barcode=${barcodeText}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+
+                    // Tampilkan data hasil reverse search
+                    let resultHTML = `
+                            <p><strong>Item:</strong> ${data.item?.name_item || '-'}</p>
+                            <p><strong>Origin:</strong> ${data.origin?.name_origin || '-'}</p>
+                            <p><strong>Buyer:</strong> ${data.buyer?.name || '-'}</p>
+                            <p><strong>Purchase Index:</strong> ${data.purchase?.purchaseindex || '-'}</p>
+                            <p><strong>Container Index:</strong> ${data.container?.containerindex || '-'}</p>
+                        `;
+                    document.getElementById('resultArea').innerHTML = resultHTML;
+
+                    // Opsional: tampilkan juga barcode-nya
+                    document.getElementById('barcodeText').textContent = barcodeText;
+                    generateBarcode();
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Terjadi kesalahan saat mencari barcode.');
+                });
+        }
+
         function generateBarcode() {
             const barcodeTextSpan = document.getElementById('barcodeText');
             const rawCode = barcodeTextSpan.textContent.trim();
@@ -886,7 +903,7 @@
             JsBarcode(svg, code, {
                 format: "CODE128",
                 displayValue: true,
-                fontSize: 18,
+                fontSize: 25,
                 height: 80
             });
 
@@ -898,6 +915,11 @@
             const img = document.getElementById('barcodeImage');
             img.src = encodedData;
         }
+
+        // Generate barcode saat halaman pertama kali terbuka
+        document.addEventListener('DOMContentLoaded', function() {
+            generateBarcode();
+        });
 
         function printBarcode() {
             const barcodeImg = document.getElementById('barcodeImage');

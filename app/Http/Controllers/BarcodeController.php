@@ -406,4 +406,36 @@ class BarcodeController extends Controller
         ]);
     }
 
+    public function reverseSearch(Request $request)
+    {
+        $barcode = $request->query('barcode');
+        if (!$barcode) {
+            return response()->json(['error' => 'Barcode tidak diberikan'], 400);
+        }
+
+        if (strlen($barcode) !== 12) {
+            return response()->json(['error' => 'Panjang barcode tidak valid'], 400);
+        }
+
+        // Pecah berdasarkan posisi
+        $itemId = substr($barcode, 0, 4);             // 0001
+        $kodeOrigin = substr($barcode, 4, 1);         // X
+        $buyerId = substr($barcode, 5, 2);            // 01
+        $purchaseIndex = substr($barcode, 7, 2);      // 58
+        $containerIndex = substr($barcode, 9, 3);     // 58B
+
+        $item = Item::find($itemId);
+        $origin = Origin::whereJsonContains('kode_origin', $kodeOrigin)->first();
+        $buyer = Buyer::find($buyerId);
+        $purchase = Purchase::where('purchaseindex', $purchaseIndex)->first();
+        $container = Container::where('containerindex', $containerIndex)->first();
+
+        return response()->json([
+            'item' => $item,
+            'origin' => $origin,
+            'buyer' => $buyer,
+            'purchase' => $purchase,
+            'container' => $container,
+        ]);
+    }
 }

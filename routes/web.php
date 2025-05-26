@@ -30,6 +30,7 @@ Route::post('/barcode/container', [BarcodeController::class, 'storeContainer'])-
 Route::delete('/barcode/container/{container}', [BarcodeController::class, 'destroyContainer'])->name('barcode.containers.destroy');
 Route::post('/barcode/origin', [BarcodeController::class, 'storeOrigin'])->name('barcode.origins.store');
 Route::delete('/barcode/origin/{origin}', [BarcodeController::class, 'destroyOrigin'])->name('barcode.origins.destroy');
+Route::get('/barcode/reverse-search', [BarcodeController::class, 'reverseSearch']);
 
 // Buyer
 Route::post('/barcode/buyer', [BarcodeController::class, 'storeBuyer'])->name('barcode.buyers.store');

@@ -1010,56 +1010,6 @@
             document.getElementById('lettersInput').value = selectedLetters.join(',');
         }
 
-        // form line handling
-        document.getElementById('addLineForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form = e.target;
-            const formData = new FormData(form);
-            const submitButton = form.querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.textContent;
-
-            // Show loading state
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...';
-
-            fetch(form.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => {
-                            throw new Error(err.message || "Failed to add line");
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Add to select dropdown
-                    const lineSelect = document.getElementById('lineSelect');
-                    const newOption = document.createElement('option');
-                    newOption.value = data.id;
-                    newOption.textContent = data.name;
-                    lineSelect.appendChild(newOption);
-
-                    // Reset form and close modal
-                    form.reset();
-                    closeModal('AddLineModal');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert(error.message || 'An error occurred while adding the line');
-                })
-                .finally(() => {
-                    submitButton.disabled = false;
-                    submitButton.textContent = originalButtonText;
-                });
-        });
-
         function openModal(modalId) {
             const modal = document.getElementById(modalId);
             if (modal) {
@@ -1164,6 +1114,56 @@
                 }
             });
         }
+
+        // form line handling
+        document.getElementById('addLineForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+
+            // Show loading state
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...';
+
+            fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || "Failed to add line");
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Add to select dropdown
+                    const lineSelect = document.getElementById('lineSelect');
+                    const newOption = document.createElement('option');
+                    newOption.value = data.id;
+                    newOption.textContent = data.name;
+                    lineSelect.appendChild(newOption);
+
+                    // Reset form and close modal
+                    form.reset();
+                    closeModal('AddLineModal');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(error.message || 'An error occurred while adding the line');
+                })
+                .finally(() => {
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalButtonText;
+                });
+        });
 
         // Buyer Form Handling
         document.getElementById('addBuyerForm').addEventListener('submit', function(e) {

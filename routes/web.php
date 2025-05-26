@@ -4,11 +4,7 @@ use App\Http\Controllers\BarcodeController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
-
-Route::get('/barcode', [BarcodeController::class, 'index'])->name('barcode');
+Route::get('/', [BarcodeController::class, 'index'])->name('barcode');
 
 // Item
 Route::post('/barcode/item', [BarcodeController::class, 'storeItem'])->name('barcode.items.store');
@@ -45,17 +41,5 @@ Route::delete('/barcode/purchase/{purchase}', [BarcodeController::class, 'destro
 // API for dynamic dropdown
 Route::get('/api/buyers/{buyer}/purchases', [BarcodeController::class, 'getPurchasesByBuyer']);
 
-
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
-Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', 'settings/profile');
-
-    Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
-    Volt::route('settings/password', 'settings.password')->name('settings.password');
-    Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
-});
 
 require __DIR__.'/auth.php';

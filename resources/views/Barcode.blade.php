@@ -1026,6 +1026,11 @@
             }
         };
 
+        function selectLetter(button) {
+            const selectedLetter = button.getAttribute('data-letter');
+            updateBarcodePart(1, selectedLetter, 1); // index ke-1 adalah bagian 'line'
+        }
+
         function updateBarcodePart(index, value, length) {
             const barcodeSpan = document.getElementById('barcodeText');
             let parts = barcodeSpan.textContent.trim().split('.');
@@ -1047,11 +1052,6 @@
             const buyerSelect = document.getElementById('buyerSelect');
             const buyerId = buyerSelect.value;
             if (buyerId) updateBarcodePart(2, buyerId, 2); // buyer di index ke-2
-        }
-
-        function selectLetter(button) {
-            const selectedLetter = button.getAttribute('data-letter');
-            updateBarcodePart(1, selectedLetter, 1); // index ke-1 adalah bagian 'line'
         }
 
         function updatePurchase() {
@@ -1199,7 +1199,6 @@
                     const newOption = document.createElement('option');
                     newOption.value = data.id;
                     newOption.textContent = data.name;
-                    newOption.selected = true;
                     buyerSelect.appendChild(newOption);
 
                     // Reset form and close modal

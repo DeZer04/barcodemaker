@@ -57,6 +57,31 @@ class BarcodeController extends Controller
             'warnaanyam_id' => 'required|exists:warnaanyams,id',
         ]);
 
+        // Cek kombinasi unik (case-insensitive untuk name_item)
+        $exists = item::whereRaw('LOWER(name_item) = ?', [strtolower($request->name_item)])
+            ->where('jeniskayu_id', $request->jeniskayu_id)
+            ->where('grade_id', $request->grade_id)
+            ->where('finishing_id', $request->finishing_id)
+            ->where('jenisanyam_id', $request->jenisanyam_id)
+            ->where('warnaanyam_id', $request->warnaanyam_id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kombinasi item sudah ada.',
+            ], 422);
+        }
+
+        // Cek name_item saja (case-insensitive)
+        $nameExists = item::whereRaw('LOWER(name_item) = ?', [strtolower($request->name_item)])->exists();
+        if ($nameExists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nama item sudah digunakan.',
+            ], 422);
+        }
+
         item::create([
             'name_item' => $request->name_item,
             'jeniskayu_id' => $request->jeniskayu_id,

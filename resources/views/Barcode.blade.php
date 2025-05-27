@@ -20,7 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://kit.fontawesome.com/5ac6c6fc32.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -74,7 +74,7 @@
                                 class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                                 <option value="" disabled selected>Choose an item...</option>
                                 @foreach ($items as $item)
-                                    <option value="{{ $item->id }}">{{ $item->namaitem }}</option>
+                                <option value="{{ $item->id }}">{{ $item->namaitem }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -104,11 +104,11 @@
                                 Line</label>
                             <div class="grid grid-cols-5 gap-2">
                                 @foreach (range('A', 'Z') as $letter)
-                                    <button type="button"
-                                        class="letter-button px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-                                        data-letter="{{ $letter }}" onclick="selectLetter(this)">
-                                        {{ $letter }}
-                                    </button>
+                                <button type="button"
+                                    class="letter-button px-3 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                    data-letter="{{ $letter }}" onclick="selectLetter(this)">
+                                    {{ $letter }}
+                                </button>
                                 @endforeach
                             </div>
                         </div>
@@ -133,7 +133,7 @@
                                     class="flex-1 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                                     <option value="" disabled selected>Select buyer...</option>
                                     @foreach ($buyers as $buyer)
-                                        <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
+                                    <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
                                     @endforeach
                                 </select>
                                 <button onclick="openModal('AddBuyerModal')"
@@ -152,8 +152,9 @@
                                     class="flex-1 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                                     <option value="" disabled selected>Select purchase order...</option>
                                     @foreach ($purchases as $purchase)
-                                        <option value="{{ $purchase->id }}" data-buyer-id="{{ $purchase->buyer_id }}">
-                                            {{ $purchase->purchaseindex }}</option>
+                                    <option value="{{ $purchase->id }}" data-buyer-id="{{ $purchase->buyer_id }}">
+                                        {{ $purchase->purchaseindex }}
+                                    </option>
                                     @endforeach
                                 </select>
                                 <button onclick="openModal('AddPurchasesModal')"
@@ -172,9 +173,10 @@
                                     class="flex-1 px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                                     <option value="" disabled selected>Select container...</option>
                                     @foreach ($containers as $container)
-                                        <option value="{{ $container->id }}"
-                                            data-buyer-id="{{ $container->buyer_id }}">
-                                            {{ $container->containerindex }}</option>
+                                    <option value="{{ $container->id }}"
+                                        data-buyer-id="{{ $container->buyer_id }}">
+                                        {{ $container->containerindex }}
+                                    </option>
                                     @endforeach
                                 </select>
                                 <button onclick="openModal('AddContainerModal')"
@@ -259,32 +261,32 @@
                 </thead>
                 <tbody id="lineTableBody">
                     @foreach ($origins as $index => $line)
-                        <tr>
-                            <td class="px-3 py-2 border">{{ $index + 1 }}</td>
-                            <td class="px-3 py-2 border" id="lineName-{{ $line->id }}">{{ $line->name_origin }}
-                            </td>
-                            <td class="px-3 py-2 border">
-                                @php
-                                    $kode = $line->kode_origin;
-                                    if (is_string($kode)) {
-                                        $parsed = json_decode($kode, true);
-                                        if (json_last_error() === JSON_ERROR_NONE && is_array($parsed)) {
-                                            echo implode('/', $parsed);
-                                        } else {
-                                            echo e($kode);
-                                        }
-                                    } elseif (is_array($kode)) {
-                                        echo implode('/', $kode);
-                                    } else {
-                                        echo e((string) $kode);
-                                    }
-                                @endphp
-                            </td>
-                            <td class="px-3 py-2 border text-center">
-                                <button class="text-red-600 hover:underline"
-                                    onclick="deleteLine({{ $line->id }})">Delete</button>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td class="px-3 py-2 border">{{ $index + 1 }}</td>
+                        <td class="px-3 py-2 border" id="lineName-{{ $line->id }}">{{ $line->name_origin }}
+                        </td>
+                        <td class="px-3 py-2 border">
+                            @php
+                            $kode = $line->kode_origin;
+                            if (is_string($kode)) {
+                            $parsed = json_decode($kode, true);
+                            if (json_last_error() === JSON_ERROR_NONE && is_array($parsed)) {
+                            echo implode('/', $parsed);
+                            } else {
+                            echo e($kode);
+                            }
+                            } elseif (is_array($kode)) {
+                            echo implode('/', $kode);
+                            } else {
+                            echo e((string) $kode);
+                            }
+                            @endphp
+                        </td>
+                        <td class="px-3 py-2 border text-center">
+                            <button class="text-red-600 hover:underline"
+                                onclick="deleteLine({{ $line->id }})">Delete</button>
+                        </td>
+                    </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -320,30 +322,30 @@
                 </thead>
                 <tbody id="manageItemTableBody">
                     @foreach ($items as $index => $item)
-                        <tr>
-                            <td class="px-3 py-2 border">{{ $index + 1 }}</td>
-                            <td class="px-3 py-2 border" id="itemName-{{ $item->id }}">{{ $item->name_item }}
-                            </td>
-                            <td class="px-3 py-2 border text-center" id="itemJenisKayu-{{ $item->id }}">
-                                {{ $item->jeniskayu->name_jeniskayu ?? '-' }}
-                            </td>
-                            <td class="px-3 py-2 border text-center" id="itemGrade-{{ $item->id }}">
-                                {{ $item->grade->name_grade ?? '-' }}
-                            </td>
-                            <td class="px-3 py-2 border text-center" id="itemFinishing-{{ $item->id }}">
-                                {{ $item->finishing->name_finishing ?? '-' }}
-                            </td>
-                            <td class="px-3 py-2 border text-center" id="itemJenisAnyam-{{ $item->id }}">
-                                {{ $item->jenisanyam->name_jenisanyam ?? '-' }}
-                            </td>
-                            <td class="px-3 py-2 border text-center" id="itemWarnaAnyam-{{ $item->id }}">
-                                {{ $item->warnaanyam->name_warnaanyam ?? '-' }}
-                            </td>
-                            <td class="px-3 py-2 border text-center">
-                                <button class="text-red-600 hover:underline"
-                                    onclick="deleteItem({{ $item->id }})">Delete</button>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td class="px-3 py-2 border">{{ $index + 1 }}</td>
+                        <td class="px-3 py-2 border" id="itemName-{{ $item->id }}">{{ $item->name_item }}
+                        </td>
+                        <td class="px-3 py-2 border text-center" id="itemJenisKayu-{{ $item->id }}">
+                            {{ $item->jeniskayu->name_jeniskayu ?? '-' }}
+                        </td>
+                        <td class="px-3 py-2 border text-center" id="itemGrade-{{ $item->id }}">
+                            {{ $item->grade->name_grade ?? '-' }}
+                        </td>
+                        <td class="px-3 py-2 border text-center" id="itemFinishing-{{ $item->id }}">
+                            {{ $item->finishing->name_finishing ?? '-' }}
+                        </td>
+                        <td class="px-3 py-2 border text-center" id="itemJenisAnyam-{{ $item->id }}">
+                            {{ $item->jenisanyam->name_jenisanyam ?? '-' }}
+                        </td>
+                        <td class="px-3 py-2 border text-center" id="itemWarnaAnyam-{{ $item->id }}">
+                            {{ $item->warnaanyam->name_warnaanyam ?? '-' }}
+                        </td>
+                        <td class="px-3 py-2 border text-center">
+                            <button class="text-red-600 hover:underline"
+                                onclick="deleteItem({{ $item->id }})">Delete</button>
+                        </td>
+                    </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -396,7 +398,7 @@
                         id="buyer_id" name="buyer_id" required>
                         <option value="" disabled selected>Select Buyer</option>
                         @foreach ($buyers as $buyer)
-                            <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
+                        <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -436,7 +438,7 @@
                         id="buyer_id" name="buyer_id" required>
                         <option value="" disabled selected>Select Buyer</option>
                         @foreach ($buyers as $buyer)
-                            <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
+                        <option value="{{ $buyer->id }}">{{ $buyer->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -476,11 +478,11 @@
                 <p class="text-sm font-medium text-gray-700 mb-2">Choose up to 3 Letters:</p>
                 <div class="grid grid-cols-8 gap-1 max-h-40 overflow-y-auto" id="letter-container">
                     @foreach (range('A', 'Z') as $letter)
-                        <button type="button"
-                            class="letter-button text-black focus:bg-blue-600 focus:text-white hover:bg-blue-600 hover:text-white px-2 py-1 bg-white border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                            data-letter="{{ $letter }}" onclick="toggleLetter(this)">
-                            {{ $letter }}
-                        </button>
+                    <button type="button"
+                        class="letter-button text-black focus:bg-blue-600 focus:text-white hover:bg-blue-600 hover:text-white px-2 py-1 bg-white border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                        data-letter="{{ $letter }}" onclick="toggleLetter(this)">
+                        {{ $letter }}
+                    </button>
                     @endforeach
                 </div>
             </div>
@@ -520,7 +522,7 @@
                             id="jeniskayu_id" name="jeniskayu_id" required>
                             <option value="" disabled selected>Select Jenis Kayu</option>
                             @foreach ($jeniskayus as $jeniskayu)
-                                <option value="{{ $jeniskayu->id }}">{{ $jeniskayu->name_jeniskayu }}</option>
+                            <option value="{{ $jeniskayu->id }}">{{ $jeniskayu->name_jeniskayu }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -539,7 +541,7 @@
                             id="grade_id" name="grade_id" required>
                             <option value="" disabled selected>Select Item Grade</option>
                             @foreach ($grades as $grade)
-                                <option value="{{ $grade->id }}">{{ $grade->name_grade }}</option>
+                            <option value="{{ $grade->id }}">{{ $grade->name_grade }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -559,7 +561,7 @@
                             id="finishing_id" name="finishing_id" required>
                             <option value="" disabled selected>Select Finishing</option>
                             @foreach ($finishings as $finishing)
-                                <option value="{{ $finishing->id }}">{{ $finishing->name_finishing }}</option>
+                            <option value="{{ $finishing->id }}">{{ $finishing->name_finishing }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -579,7 +581,7 @@
                             id="jenisanyam_id" name="jenisanyam_id" onchange="filterWarnaAnyam(this);">
                             <option value="" disabled selected>Pilih Jenis Anyam</option>
                             @foreach ($jenisanyams as $jenisanyam)
-                                <option value="{{ $jenisanyam->id }}">{{ $jenisanyam->name_jenisanyam }}</option>
+                            <option value="{{ $jenisanyam->id }}">{{ $jenisanyam->name_jenisanyam }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -600,10 +602,10 @@
                             id="warnaanyam_id" name="warnaanyam_id">
                             <option value="" disabled selected>Pilih Warna Anyam</option>
                             @foreach ($warnaanyams as $warnaanyam)
-                                <option value="{{ $warnaanyam->id }}"
-                                    data-jenisanyam-id="{{ $warnaanyam->jenisanyam_id }}">
-                                    {{ $warnaanyam->name_warnaanyam }}
-                                </option>
+                            <option value="{{ $warnaanyam->id }}"
+                                data-jenisanyam-id="{{ $warnaanyam->jenisanyam_id }}">
+                                {{ $warnaanyam->name_warnaanyam }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -627,169 +629,202 @@
         </div>
     </div>
 
-    <!-- Modal for Adding New Jenis Kayu -->
+    <!-- Add New Jenis Kayu Modal -->
     <div id="AddJenisKayuModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md p-6 relative">
-            <button onclick="closeModal('AddJenisKayuModal')"
-                class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
-                <i class="fa-solid fa-x"></i>
-            </button>
-            <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Add New Jenis Kayu</h3>
-            <form id="addJenisKayuForm" class="space-y-4" method="POST"
-                action="{{ route('barcode.jeniskayus.store') }}">
-                @csrf
-                <div>
-                    <label for="name_jeniskayu"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jenis Kayu Name</label>
-                    <input type="text" id="name_jeniskayu" name="name_jeniskayu"
-                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                        placeholder="Enter jenis kayu name" required>
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md mx-4 relative max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="sticky top-0 bg-white dark:bg-gray-800 p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                        <i class="fa-solid fa-tree mr-2"></i>
+                        Add New Jenis Kayu
+                    </h3>
+                    <button onclick="closeModal('AddJenisKayuModal')"
+                        class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
                 </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeModal('AddJenisKayuModal')"
-                        class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
-                    <button type="submit"
-                        class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200">Save</button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-6">
+                <!-- Add Form -->
+                <form id="addJenisKayuForm" class="space-y-5">
+                    @csrf
+                    <div>
+                        <label for="name_jeniskayu" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Jenis Kayu Name
+                        </label>
+                        <input type="text" id="name_jeniskayu" name="name_jeniskayu"
+                            class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 placeholder-gray-400 dark:placeholder-gray-500"
+                            placeholder="e.g. Mahogany, Teak, Oak"
+                            required>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-1">
+                        <button type="button" onclick="closeModal('AddJenisKayuModal')"
+                            class="px-5 py-2.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 font-medium">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                            class="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors duration-200 shadow-sm hover:shadow-md">
+                            <i class="fa-solid fa-save mr-1"></i>
+                            Save
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Jenis Kayu List Section -->
+                <div class="mt-8">
+                    <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
+                        <i class="fa-solid fa-list-check mr-2 text-blue-500"></i>
+                        Jenis Kayu List
+                    </h4>
+
+                    <div id="jenisKayuListContainer">
+                        @if($jeniskayus->isEmpty())
+                        <div class="text-center py-4 text-gray-500 dark:text-gray-400">
+                            <i class="fa-solid fa-inbox text-2xl mb-2"></i>
+                            <p>No jenis kayu added yet</p>
+                        </div>
+                        @else
+                        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                            @foreach ($jeniskayus as $jeniskayu)
+                            <li class="py-3 flex items-center justify-between text-gray-700 dark:text-gray-300" data-id="{{ $jeniskayu->id }}">
+                                <span class="font-medium">
+                                    <i class="fa-solid fa-tree text-green-500 mr-2"></i>
+                                    {{ $jeniskayu->name_jeniskayu }}
+                                </span>
+                                <button type="button" onclick="deleteJenisKayu('{{ $jeniskayu->id }}')"
+                                    class="ml-1 text-red-600 hover:text-red-800 transition-colors duration-200"
+                                    title="Delete jenis kayu">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </li>
+                            @endforeach
+                        </ul>
+                        @endif
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
     <!-- Modal for Adding New Jenis Anyam -->
-    <div id="AddJenisAnyamModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md p-6 relative">
-            <button onclick="closeModal('AddJenisAnyamModal')"
-                class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
-                <i class="fa-solid fa-x"></i>
-            </button>
-            <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                Add New Jenis Anyam
-            </h3>
-            <form id="addJenisAnyamForm" class="space-y-4" method="POST"
-                action="{{ route('barcode.jenisanyams.store') }}">
-                @csrf
-                <div>
-                    <label for="name_jenisanyam"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jenis Anyam
-                        Name</label>
-                    <input type="text" id="name_jenisanyam" name="name_jenisanyam"
-                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                        placeholder="Enter jenis anyam name" required>
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeModal('AddJenisAnyamModal')"
-                        class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
-                    <button type="submit"
-                        class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200">Save</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <x-modal 
+        id="AddJenisAnyamModal"
+        title="Add New Jenis Anyam"
+        formId="addJenisAnyamForm"
+        formAction="{{ route('barcode.jenisanyams.store') }}"
+        hasList="false"
+    >
+        @slot('formFields')
+            <div>
+                <label for="name_jenisanyam" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Jenis Anyam Name
+                </label>
+                <input type="text" id="name_jenisanyam" name="name_jenisanyam"
+                    class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 placeholder-gray-400 dark:placeholder-gray-500"
+                    placeholder="e.g. Anyaman A, Anyaman B" 
+                    required>
+            </div>
+        @endslot
+    </x-modal>
 
-    <!-- Modal for Adding New Warna Anyam -->
-    <div id="AddWarnaAnyamModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md p-6 relative">
-            <button onclick="closeModal('AddWarnaAnyamModal')"
-                class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
-                <i class="fa-solid fa-x"></i>
-            </button>
-            <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Add New Warna Anyam</h3>
-            <form id="addWarnaAnyamForm" class="space-y-4" method="POST"
-                action="{{ route('barcode.warnaanyams.store') }}">
-                @csrf
-                <div>
-                    <label for="jenisanyam_id"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jenis Anyam</label>
-                    <select
-                        class="select-custom w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                        id="jenisanyam_id" name="jenisanyam_id" required>
-                        <option value="" disabled selected>Select Jenis Anyam</option>
-                        @foreach ($jenisanyams as $jenisanyam)
-                            <option value="{{ $jenisanyam->id }}">{{ $jenisanyam->name_jenisanyam }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="name_warnaanyam"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Warna Anyam
-                        Name</label>
-                    <input type="text" id="name_warnaanyam" name="name_warnaanyam"
-                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                        placeholder="Enter warna anyam name" required>
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeModal('AddWarnaAnyamModal')"
-                        class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
-                    <button type="submit"
-                        class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200">Save</button>
-                </div>
-            </form>
-            <div class="my-4 border-t border-gray-300 dark:border-gray-600"></div>
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Warna Anyam List</h3>
-            <ul id="warnaanyamList" class="space-y-2">
-                @foreach ($warnaanyams as $warnaanyam)
-                    <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-2 rounded-lg"
-                        data-id="{{ $warnaanyam->id }}">
-                        <span>
-                            {{ $warnaanyam->name_warnaanyam }}
-                            <span class="text-xs text-gray-500 ml-2">
-                                (@php
-                                    $jenis = $jenisanyams->firstWhere('id', $warnaanyam->jenisanyam_id);
-                                @endphp
-                                {{ $jenis ? $jenis->name_jenisanyam : 'Unknown' }})
-                            </span>
-                        </span>
-                        <button type="button" onclick="deleteWarnaAnyam('{{ $warnaanyam->id }}')"
-                            class="text-red-600 hover:text-red-800 transition-colors duration-200">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </li>
-                @endforeach
-            </ul>
-        </div>
-    </div>
+    <x-modal 
+        id="AddWarnaAnyamModal"
+        title="Add New Warna Anyam"
+        formId="addWarnaAnyamForm"
+        formAction="{{ route('barcode.warnaanyams.store') }}"
+        hasList="true"
+        listTitle="Warna Anyam List"
+        icon="fa-palette"
+    >
+        @slot('formFields')
+            <div>
+                <label for="jenisanyam_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Jenis Anyam
+                </label>
+                <select id="jenisanyam_id" name="jenisanyam_id"
+                    class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
+                    required>
+                    <option value="" disabled selected>Select Jenis Anyam</option>
+                    @foreach ($jenisanyams as $jenisanyam)
+                        <option value="{{ $jenisanyam->id }}">{{ $jenisanyam->name_jenisanyam }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="name_warnaanyam" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Warna Anyam Name
+                </label>
+                <input type="text" id="name_warnaanyam" name="name_warnaanyam"
+                    class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 placeholder-gray-400 dark:placeholder-gray-500"
+                    placeholder="e.g. Red, Blue, Green" 
+                    required>
+            </div>
+        @endslot
 
-    <!-- Modal for Adding New Finishing -->
-    <div id="AddFinishingModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-md p-6 relative">
-            <button onclick="closeModal('AddFinishingModal')"
-                class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200">
-                <i class="fa-solid fa-x"></i>
-            </button>
-            <h3 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Add New Finishing</h3>
-            <form id="addFinishingForm" class="space-y-4" method="POST"
-                action="{{ route('barcode.finishings.store') }}">
-                @csrf
-                <div>
-                    <label for="name_finishing"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Finishing Name</label>
-                    <input type="text" id="name_finishing" name="name_finishing"
-                        class="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200"
-                        placeholder="Enter finishing name" required>
-                </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeModal('AddFinishingModal')"
-                        class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
-                    <button type="submit"
-                        class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200">Save</button>
-                </div>
-            </form>
-            <div class="my-4 border-t border-gray-300 dark:border-gray-600"></div>
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Finishing List</h3>
-            <ul id="finishingList" class="space-y-2">
-                @foreach ($finishings as $finishing)
-                    <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-2 rounded-lg"
-                        data-id="{{ $finishing->id }}">
-                        <span>{{ $finishing->name_finishing }}</span>
-                        <button type="button" onclick="deleteFinishing('{{ $finishing->id }}')"
-                            class="text-red-600 hover:text-red-800 transition-colors duration-200">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </li>
-                @endforeach
-            </ul>
-        </div>
-    </div>
+        @slot('listItems')
+            @foreach ($warnaanyams as $warnaanyam)
+            <li class="py-3 flex items-center justify-between text-gray-700 dark:text-gray-300" data-id="{{ $warnaanyam->id }}">
+                <span class="font-medium">
+                    <i class="fa-solid fa-palette text-purple-500 mr-2"></i>
+                    {{ $warnaanyam->name_warnaanyam }}
+                    <span class="text-xs text-gray-500 ml-2">
+                        (@php
+                        $jenis = $jenisanyams->firstWhere('id', $warnaanyam->jenisanyam_id);
+                        @endphp
+                        {{ $jenis ? $jenis->name_jenisanyam : 'Unknown' }})
+                    </span>
+                </span>
+                <button type="button" onclick="deleteWarnaAnyam('{{ $warnaanyam->id }}')"
+                    class="ml-1 text-red-600 hover:text-red-800 transition-colors duration-200"
+                    title="Delete warna anyam">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </li>
+            @endforeach
+        @endslot
+    </x-modal>
+
+    <x-modal 
+        id="AddFinishingModal"
+        title="Add New Finishing"
+        formId="addFinishingForm"
+        formAction="{{ route('barcode.finishings.store') }}"
+        hasList="true"
+        listTitle="Finishing List"
+        icon="fa-paint-roller"
+    >
+        @slot('formFields')
+            <div>
+                <label for="name_finishing" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Finishing Name
+                </label>
+                <input type="text" id="name_finishing" name="name_finishing"
+                    class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition duration-200 placeholder-gray-400 dark:placeholder-gray-500"
+                    placeholder="e.g. Glossy, Matte, Textured" 
+                    required>
+            </div>
+        @endslot
+
+        @slot('listItems')
+            @foreach ($finishings as $finishing)
+            <li class="py-3 flex items-center justify-between text-gray-700 dark:text-gray-300" data-id="{{ $finishing->id }}">
+                <span class="font-medium">
+                    <i class="fa-solid fa-paint-roller text-yellow-500 mr-2"></i>
+                    {{ $finishing->name_finishing }}
+                </span>
+                <button type="button" onclick="deleteFinishing('{{ $finishing->id }}')"
+                    class="ml-1 text-red-600 hover:text-red-800 transition-colors duration-200"
+                    title="Delete finishing">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </li>
+            @endforeach
+        @endslot
+    </x-modal>
 
     <!-- Modal for Adding New Grade -->
     <div id="AddGradeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
@@ -816,14 +851,14 @@
             <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Grade List</h3>
             <ul id="gradeList" class="space-y-2">
                 @foreach ($grades as $grade)
-                    <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-2 rounded-lg"
-                        data-id="{{ $grade->id }}">
-                        <span class="ml-4">{{ $grade->name_grade }}</span>
-                        <button type="button" onclick="deleteGrade('{{ $grade->id }}')"
-                            class="text-red-600 hover:text-red-800 transition-colors duration-200">
-                            <i class="fa-solid fa-trash mr-4"></i>
-                        </button>
-                    </li>
+                <li class="flex justify-between items-center bg-gray-100 dark:bg-gray-700 p-2 rounded-lg"
+                    data-id="{{ $grade->id }}">
+                    <span class="ml-4">{{ $grade->name_grade }}</span>
+                    <button type="button" onclick="deleteGrade('{{ $grade->id }}')"
+                        class="text-red-600 hover:text-red-800 transition-colors duration-200">
+                        <i class="fa-solid fa-trash mr-4"></i>
+                    </button>
+                </li>
                 @endforeach
             </ul>
             <div class="flex flex-row justify-end mt-5">
@@ -832,17 +867,6 @@
                     Cancel
                 </button>
             </div>
-        </div>
-
-    </div>
-
-    <div id="SuccessModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm p-6 relative text-center">
-            <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white" id="successModalMessage"></h3>
-            <button onclick="closeModal('SuccessModal')"
-                class="mt-4 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200">
-                OK
-            </button>
         </div>
     </div>
 
@@ -919,7 +943,121 @@
         // Generate barcode saat halaman pertama kali terbuka
         document.addEventListener('DOMContentLoaded', function() {
             generateBarcode();
+
+            const form = document.getElementById('addJenisKayuForm');
+            if (form) {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    const form = e.target;
+                    const formData = new FormData(form);
+
+                    try {
+                        const response = await fetch("{{ route('barcode.jeniskayus.store') }}", {
+                            method: "POST",
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            },
+                            body: formData
+                        });
+
+                        if (!response.ok) throw new Error('Failed to add Jenis Kayu');
+
+                        const data = await response.json();
+
+                        // Notifikasi (pakai alert atau toastr/iziToast)
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Jenis Kayu berhasil ditambahkan!',
+                            confirmButtonColor: '#3085d6'
+                        });
+
+                        // Tambahkan ke daftar jenis kayu
+                        const list = document.getElementById('jenisKayuList');
+                        const li = document.createElement('li');
+                        li.className = "flex items-center justify-between text-gray-700 dark:text-gray-300";
+                        li.dataset.id = data.id;
+                        li.innerHTML = `
+                                    <span>${data.name_jeniskayu}</span>
+                                    <button type="button" onclick="deleteJenisKayu('${data.id}')" class="ml-2 text-red-600 hover:text-red-800 transition-colors duration-200">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                `;
+                        list.appendChild(li);
+
+                        // (Opsional) Tambahkan ke dropdown jika Anda punya
+                        const dropdown = document.getElementById('jeniskayu_id');
+                        if (dropdown) {
+                            const option = document.createElement('option');
+                            option.value = data.id;
+                            option.textContent = data.name_jeniskayu;
+                            dropdown.appendChild(option);
+                        }
+
+                        // Reset form dan tutup modal
+                        form.reset();
+                        closeModal('AddJenisKayuModal');
+
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: 'Terjadi kesalahan. Silakan coba lagi.',
+                            confirmButtonColor: '#d33'
+                        });
+                        console.error(error);
+                    }
+                });
+            }
+
+
         });
+
+        // delete Jenis Kayu
+        function deleteJenisKayu(id) {
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Jenis kayu ini akan dihapus secara permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (!result.isConfirmed) return;
+
+                fetch(`/barcode/jeniskayu/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        }
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Gagal menghapus.');
+                        // Hapus dari UI
+                        document.querySelector(`#jenisKayuList li[data-id="${id}"]`)?.remove();
+                        // Hapus dari dropdown
+                        document.querySelector(`#jeniskayu_id option[value="${id}"]`)?.remove();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Jenis Kayu berhasil dihapus.',
+                            confirmButtonColor: '#3085d6'
+                        });
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: 'Tidak dapat menghapus Jenis Kayu.',
+                            confirmButtonColor: '#d33'
+                        });
+                    });
+            });
+        }
 
         function printBarcode() {
             const barcodeImg = document.getElementById('barcodeImage');
@@ -1462,116 +1600,7 @@
             };
         }
 
-        // Jenis Kayu Form Handling
-        document.getElementById('addJenisKayuForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form = e.target;
-            const formData = new FormData(form);
-            const submitButton = form.querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.textContent;
 
-            // Show loading state
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Processing...';
-
-            fetch(form.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => {
-                            throw new Error(err.message || "Failed to add jenis kayu");
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Add to select dropdown
-                    const jenisKayuSelect = document.getElementById('jeniskayu_id');
-                    const newOption = document.createElement('option');
-                    newOption.value = data.id;
-                    newOption.textContent = data.name_jeniskayu;
-                    newOption.selected = true;
-                    jenisKayuSelect.appendChild(newOption);
-
-                    // Reset form and close modal
-                    form.reset();
-                    closeModal('AddJenisKayuModal');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert(error.message || 'An error occurred while adding the jenis kayu');
-                })
-                .finally(() => {
-                    submitButton.disabled = false;
-                    submitButton.textContent = originalButtonText;
-                });
-        });
-
-        // delete Jenis Kayu
-        function deleteJenisKayu(id) {
-            // Show confirmation modal instead of confirm()
-            const confirmModal = document.createElement('div');
-            confirmModal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/40';
-            confirmModal.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-sm p-6 relative text-center">
-                    <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Are you sure you want to delete this jenis kayu?</h3>
-                    <div class="flex justify-center gap-4">
-                        <button id="cancelDeleteJenisKayu" class="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200">Cancel</button>
-                        <button id="confirmDeleteJenisKayu" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition-colors duration-200">Delete</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(confirmModal);
-            document.body.classList.add('overflow-hidden');
-
-            document.getElementById('cancelDeleteJenisKayu').onclick = function() {
-                document.body.removeChild(confirmModal);
-                document.body.classList.remove('overflow-hidden');
-            };
-
-            document.getElementById('confirmDeleteJenisKayu').onclick = function() {
-                fetch(`/barcode/jeniskayu/${id}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                'content')
-                        }
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error("Failed to delete jenis kayu");
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Remove from select dropdown
-                        const jenisKayuSelect = document.getElementById('jeniskayu_id');
-                        const optionToRemove = jenisKayuSelect.querySelector(`option[value="${id}"]`);
-                        if (optionToRemove) {
-                            jenisKayuSelect.removeChild(optionToRemove);
-                        }
-
-                        // Remove from list
-                        const listItem = document.querySelector(`li[data-id="${id}"]`);
-                        if (listItem) {
-                            listItem.parentNode.removeChild(listItem);
-                        }
-                        // Close confirmation modal
-                        document.body.removeChild(confirmModal);
-                        document.body.classList.remove('overflow-hidden');
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert(error.message || 'An error occurred while deleting the jenis kayu');
-                    });
-            };
-        }
 
         // Jenis Anyam Form Handling
         document.getElementById('addJenisAnyamForm').addEventListener('submit', function(e) {

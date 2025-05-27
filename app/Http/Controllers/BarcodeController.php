@@ -114,26 +114,20 @@ class BarcodeController extends Controller
             'name_jeniskayu' => $request->name_jeniskayu,
         ]);
 
-        return response()->json([
-            'id' => $jeniskayu->id,
-            'name_jeniskayu' => $jeniskayu->name_jeniskayu,
-        ]);
+        return response()->json($jeniskayu, 201);
     }
 
     public function destroyJenisKayu(jeniskayu $jeniskayu)
     {
         // Check if the jeniskayu is used in any items
-        if ($jeniskayu->items()->exists()) {
+        if ($jeniskayu->item()->exists()) {
             return redirect()->back()->with('error', 'Jenis Kayu cannot be deleted because it is associated with items.');
         }
 
         // Delete the jeniskayu
         $jeniskayu->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Jenis Kayu deleted successfully.',
-        ]);
+        return response()->json(['message' => 'Jenis kayu deleted successfully.']);
     }
 
     //grades
